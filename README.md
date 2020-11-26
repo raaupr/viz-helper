@@ -15,7 +15,7 @@ Data visualization scripts for various projects.
 ## Run the script
 Run these commands in the terminal in the unzipped/cloned folder.
 
-### Distance + Length vs Time: `plot_distance_length.py`
+### Chromosome Distance & Spindle Length vs Time: `plot_distance_length.py`
 Example:
 ```bash
 python plot_distance_length.py "~/Documents/distance.xlsx" "~/Documents/length.xlsx"
