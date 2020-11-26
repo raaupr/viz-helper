@@ -19,7 +19,7 @@ Run these commands in the terminal in the unzipped/cloned folder.
 ```bash
 python plot_distance_length.py "path_to_distance_file" "path_to_length_file"
 ```
-Replace `path_to_distance_file` and `path_to_length_file` to the full/relative path of your data files.
+Replace `path_to_distance_file` and `path_to_length_file` with the full/relative path of your data files.
 
 To know more options you can use to customize the plot, run:
 ```bash
@@ -29,4 +29,4 @@ Example command with customization options:
 ```bash
 python plot_distance_length.py "~/Documents/distance.xlsx" "~/Documents/length.xlsx" -outfile="~/Documents/plot200.jpg" -distance_min=-200 
 ```
-will use data from `"~/Documents/distance.xlsx"` and `"~/Documents/length.xlsx"` and create the plot from distance `-200` to `0` and save the resulting plot to `"~/Documents/plot200.jpg"`.
+This command will use data from `"~/Documents/distance.xlsx"` and `"~/Documents/length.xlsx"` and create the plot from distance `-200` to `0` and save the resulting plot to `"~/Documents/plot200.jpg"`.
