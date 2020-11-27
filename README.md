@@ -2,7 +2,7 @@
 Data visualization scripts for various projects.
 
 ## Getting Started
-1. Install [python](https://www.python.org/downloads/) (tested with 3.9.0)
+1. Install [python](https://www.python.org/downloads/) (tested with 3.8.5)
 2. Download (or [clone](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository)) this repository: <br/>
     Download: 
     - Code > Download ZIP
@@ -11,6 +11,12 @@ Data visualization scripts for various projects.
     ```bash
     pip install -r requirements
     ```
+
+## Run GUI    
+Run this command in the terminal in the unzipped/cloned folder.
+```bash
+streamlit run viz.py
+```
 
 ## Run the script
 Run these commands in the terminal in the unzipped/cloned folder.
