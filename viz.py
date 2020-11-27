@@ -204,15 +204,16 @@ if (is_plot_distance and df_distance is not None) or (
     )
 
     outfile = st.text_input(
-        "Save as:", value=os.path.join(os.path.abspath(os.getcwd()), "plot.jpg")
+        "Save as:", value=os.path.join(os.path.abspath(os.getcwd()), "plot.eps")
     )
+    allowed_formats = ['.jpg', '.png', '.eps']
     if st.button("Save"):
-        if outfile.endswith(".jpg") or outfile.endswith(".png"):
+        if outfile[-4:] in allowed_formats:
             plt.savefig(outfile)
             st.info(f"Plot saved to {outfile}")
         else:
             st.error(
-                f"Plot not saved: save file name can only ends with either '.jpg' or '.png'"
+                f"Plot not saved: save file name can only ends with either '.jpg', '.png' or '.eps'"
             )
 
     st.pyplot(plt)
