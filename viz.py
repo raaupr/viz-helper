@@ -68,20 +68,6 @@ if (is_plot_distance and df_distance is not None) or (
     is_plot_length and df_length is not None
 ):
     # ---- CUSTOMIZATION
-    st.sidebar.header("Texts:")
-    title = st.sidebar.text_input("Title:", value="JDU233 in utero congression")
-    title_size = st.sidebar.number_input("Title size", value=15)
-    xlabel = st.sidebar.text_input(
-        "x-axis label:", value="Time relative to Anaphase Onset (s)"
-    )
-    xlabel_size = st.sidebar.number_input("x-axis label size", value=10)
-    xticks_size = st.sidebar.number_input("x-axis tick labels size", value=10)
-    ylabel = st.sidebar.text_input(
-        "y-axis label:", value="Distance to spindle equator (\u03BCm)"
-    )
-    ylabel_size = st.sidebar.number_input("y-axis label size", value=10)
-    yticks_size = st.sidebar.number_input("y-axis tick labels size", value=10)
-
     st.sidebar.header("Ranges:")
     st.sidebar.subheader("x-axis")
     if df_distance is not None:
@@ -102,6 +88,20 @@ if (is_plot_distance and df_distance is not None) or (
     st.sidebar.subheader("y-axis")
     ylim_min = st.sidebar.number_input("Min value:", value=-5)
     ylim_max = st.sidebar.number_input("Max value:", value=5)
+
+    st.sidebar.header("Texts:")
+    title = st.sidebar.text_input("Title:", value="JDU233 in utero congression")
+    title_size = st.sidebar.number_input("Title size", value=15)
+    xlabel = st.sidebar.text_input(
+        "x-axis label:", value="Time relative to Anaphase Onset (s)"
+    )
+    xlabel_size = st.sidebar.number_input("x-axis label size", value=10)
+    xticks_size = st.sidebar.number_input("x-axis tick labels size", value=10)
+    ylabel = st.sidebar.text_input(
+        "y-axis label:", value="Distance to spindle equator (\u03BCm)"
+    )
+    ylabel_size = st.sidebar.number_input("y-axis label size", value=10)
+    yticks_size = st.sidebar.number_input("y-axis tick labels size", value=10)
 
     st.sidebar.header("Sizes:")
     plot_width = st.sidebar.number_input("Plot width:", value=20)
@@ -165,6 +165,7 @@ if (is_plot_distance and df_distance is not None) or (
         df_distance = df_distance.loc[
             (df_distance.index >= min_time) & (df_distance.index <= max_time)
         ]
+        min_distance_points = df_distance.apply(lambda x: x.count(), axis=1).min()
         if is_plot_distance_means:
             distance_means, distance_stds = get_means_stds(df_distance)        
             if distance_error_type is None:
@@ -174,6 +175,7 @@ if (is_plot_distance and df_distance is not None) or (
         df_length = df_length.loc[
             (df_length.index >= min_time) & (df_length.index <= max_time)
         ]
+        min_length_points = df_length.apply(lambda x: x.count(), axis=1).min()
         if is_half_length:
             df_length = df_length.applymap(half)
         length_means, length_stds = get_means_stds(df_length)
@@ -228,5 +230,10 @@ if (is_plot_distance and df_distance is not None) or (
             st.error(
                 f"Plot not saved: save file name can only ends with either '.jpg', '.png' or '.eps'"
             )
+    
+    if df_distance is not None:
+        st.write(f"Minimum distance data points at each timestamp: {min_distance_points}")
+    if df_length is not None:
+        st.write(f"Minimum length data points at each timestamp: {min_length_points}")
 
     st.pyplot(plt)
