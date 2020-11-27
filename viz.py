@@ -109,8 +109,8 @@ if (is_plot_distance and df_distance is not None) or (
     distance_size = 40
     if df_distance is not None:
         marker = st.sidebar.text_input("Marker type for distance points", value='o')
-        distance_size = st.sidebar.number_input("Size of distance points", value=40)
         st.sidebar.markdown("See [here](https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/marker_reference.html) for possible marker types")
+        distance_size = st.sidebar.number_input("Size of distance points", value=40)
 
     st.sidebar.header("Elements:")
     if df_distance is not None:
