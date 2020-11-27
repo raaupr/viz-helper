@@ -5,15 +5,16 @@ Script to create plot of chromosome distance to splindle equator & spindle lengt
 See main() for input requirements.
 """
 
-from matplotlib import pyplot
+from typing import List, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from fire import Fire
-from typing import Tuple, List
+from matplotlib import pyplot
+from matplotlib.colors import LinearSegmentedColormap
 
 from util_colormap import get_continuous_cmap
-from matplotlib.colors import LinearSegmentedColormap
 
 DEFAULT_HEX_LIST = [
     "#FEFAE0",
@@ -164,7 +165,12 @@ def create_plot(
     ylim: Tuple[int, int],
     title: str,
     xlabel: str,
-    ylabel: str
+    ylabel: str,
+    title_size: float,
+    xlabel_size: float,
+    ylabel_size: float,
+    xticks_size: float,
+    yticks_size: float
 ) -> pyplot:
     """Create plot and save it to a file.
 
@@ -214,6 +220,16 @@ def create_plot(
         Label of the x-axis.
     ylabel: str
         Label of the y-axis.
+    title_size: float
+        Size for title.
+    xlabel_size: float
+        Size for x label.
+    ylabel_size: float
+        Size for y label.
+    xticks_size: float
+        Size for x tick labels
+    yticks_size: float
+        Size for y tick labels
 
     Returns
     -------
@@ -252,12 +268,7 @@ def create_plot(
                 ecolor=d_line_color,
             )
         elif distance_means is not None:
-            plt.plot(
-                df_distance.index,
-                distance_means,
-                linewidth=2,
-                color=d_line_color
-            )
+            plt.plot(df_distance.index, distance_means, linewidth=2, color=d_line_color)
 
     # length
     if df_length is not None:
@@ -282,7 +293,7 @@ def create_plot(
                 )
         else:
             if length_stds is None:
-                plt.plot(df_length.index, length_means, color=l_line_color) 
+                plt.plot(df_length.index, length_means, color=l_line_color)
             else:
                 plt.errorbar(
                     df_length.index,
@@ -294,9 +305,12 @@ def create_plot(
                     ecolor=l_line_color,
                 )
 
-    plt.title(title)
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
+    plt.title(title, size=title_size)
+    plt.ylabel(ylabel, size=ylabel_size)
+    plt.xlabel(xlabel, size=xlabel_size)
+
+    plt.xticks(fontsize=xticks_size)
+    plt.yticks(fontsize=yticks_size)
 
     if show_colorbar:
         plt.colorbar(sc)
@@ -442,7 +456,12 @@ def main(
         (ylim_min, ylim_max),
         title,
         xlabel,
-        ylabel
+        ylabel,
+        10,
+        10,
+        10,
+        10,
+        10,
     )
 
     plt.savefig(outfile)

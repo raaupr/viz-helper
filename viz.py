@@ -70,12 +70,17 @@ if (is_plot_distance and df_distance is not None) or (
     # ---- CUSTOMIZATION
     st.sidebar.header("Texts:")
     title = st.sidebar.text_input("Title:", value="JDU233 in utero congression")
+    title_size = st.sidebar.number_input("Title size", value=15)
     xlabel = st.sidebar.text_input(
         "x-axis label:", value="Time relative to Anaphase Onset (s)"
     )
+    xlabel_size = st.sidebar.number_input("x-axis label size", value=10)
+    xticks_size = st.sidebar.number_input("x-axis tick labels size", value=10)
     ylabel = st.sidebar.text_input(
         "y-axis label:", value="Distance to spindle equator (\u03BCm)"
     )
+    ylabel_size = st.sidebar.number_input("y-axis label size", value=10)
+    yticks_size = st.sidebar.number_input("y-axis tick labels size", value=10)
 
     st.sidebar.header("Ranges:")
     st.sidebar.subheader("x-axis")
@@ -201,6 +206,11 @@ if (is_plot_distance and df_distance is not None) or (
         title,
         xlabel,
         ylabel,
+        title_size,
+        xlabel_size,
+        ylabel_size,
+        xticks_size,
+        yticks_size
     )
 
     outfile = st.text_input(
