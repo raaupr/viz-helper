@@ -170,7 +170,8 @@ def create_plot(
     xlabel_size: float,
     ylabel_size: float,
     xticks_size: float,
-    yticks_size: float
+    yticks_size: float,
+    marker
 ) -> pyplot:
     """Create plot and save it to a file.
 
@@ -230,6 +231,8 @@ def create_plot(
         Size for x tick labels
     yticks_size: float
         Size for y tick labels
+    marker: str
+        Marker style
 
     Returns
     -------
@@ -250,7 +253,7 @@ def create_plot(
                 c=x,
                 label=df_distance.columns[i],
                 cmap=distance_cmap,
-                marker="o",
+                marker=marker,
                 s=d_size,
                 vmin=distance_min,
                 vmax=distance_max,
@@ -462,6 +465,7 @@ def main(
         10,
         10,
         10,
+        'o'
     )
 
     plt.savefig(outfile)

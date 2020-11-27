@@ -108,7 +108,9 @@ if (is_plot_distance and df_distance is not None) or (
     plot_height = st.sidebar.number_input("Plot height:", value=10)
     distance_size = 40
     if df_distance is not None:
-        distance_size = st.sidebar.number_input("Size of distance circles", value=40)
+        marker = st.sidebar.text_input("Marker type for distance points", value='o')
+        distance_size = st.sidebar.number_input("Size of distance points", value=40)
+        st.sidebar.markdown("See [here](https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/marker_reference.html) for possible marker types")
 
     st.sidebar.header("Elements:")
     if df_distance is not None:
@@ -130,9 +132,9 @@ if (is_plot_distance and df_distance is not None) or (
         length_color = None
     distance_border = "face"
     if df_distance is not None:
-        use_distance_border = st.sidebar.checkbox("Use distance circle border")
+        use_distance_border = st.sidebar.checkbox("Use border on distance marker points")
         if use_distance_border:
-            distance_border = st.sidebar.color_picker("Distance circle borders")
+            distance_border = st.sidebar.color_picker("Distance borders")
         st.sidebar.subheader("Distance colormap")
         cmap_plot = st.sidebar.empty()
         hex_list = None
@@ -210,7 +212,8 @@ if (is_plot_distance and df_distance is not None) or (
         xlabel_size,
         ylabel_size,
         xticks_size,
-        yticks_size
+        yticks_size,
+        marker
     )
 
     outfile = st.text_input(
