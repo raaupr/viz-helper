@@ -16,8 +16,11 @@ st.set_option("deprecation.showfileUploaderEncoding", False)
 st.sidebar.title("Customization options")
 
 # -- Get data
+st.sidebar.header("Distance")
 df_distance = None
 is_plot_distance = st.sidebar.checkbox("Plot distance")
+is_plot_distance_means = True
+distance_error_type = None
 if is_plot_distance:
     fin_distance = st.sidebar.file_uploader(
         "Select the chromosome-spindle distance file (.xlsx file only!)", type="xlsx"
@@ -27,12 +30,18 @@ if is_plot_distance:
         st.info(
             f"Reading distance file successful: found {len(df_distance.columns)} data points."
         )
+        is_plot_distance_means = st.sidebar.checkbox("Plot distance means", value="True")
+        distance_error_type = st.sidebar.selectbox("Error bar type", ["None", "Standard Deviation"], key="distance_error_type")
+        if distance_error_type == "None":
+            distance_error_type = None
     else:
         st.warning("\u2190 Please select the distance dataset file.")
         st.sidebar.warning("Please select the distance dataset file.")
+st.sidebar.header("Length")        
 df_length = None
 is_plot_length = st.sidebar.checkbox("Plot length")
 is_half_length = False
+length_error_type = None
 if is_plot_length:
     fin_length = st.sidebar.file_uploader(
         "Select the spindle length file (.xlsx file only!)", type="xlsx"
@@ -45,6 +54,9 @@ if is_plot_length:
         is_half_length = st.sidebar.checkbox(
             "Make length plot symmetrical w.r.t. the center", value=True
         )
+        length_error_type = st.sidebar.selectbox("Error bar type", ["None", "Standard Deviation"], key="length_error_type")
+        if length_error_type == "None":
+            length_error_type = None
     else:
         st.warning("\u2190 Please select the length dataset file.")
         st.sidebar.warning("Please select the length dataset file.")
@@ -101,7 +113,7 @@ if (is_plot_distance and df_distance is not None) or (
     show_grid = st.sidebar.checkbox("Show grid")
 
     st.sidebar.header("Colors:")
-    if df_distance is not None:
+    if df_distance is not None and is_plot_distance_means:
         distance_color = st.sidebar.color_picker(
             "Distance means & std:", value="#FFA500"
         )
@@ -140,14 +152,16 @@ if (is_plot_distance and df_distance is not None) or (
         distance_min = -3
         distance_max = 3
 
+    distance_means = None
+    distance_stds = None
     if df_distance is not None:
         df_distance = df_distance.loc[
             (df_distance.index >= min_time) & (df_distance.index <= max_time)
         ]
-        distance_means, distance_stds = get_means_stds(df_distance)
-    else:
-        distance_means = None
-        distance_stds = None
+        if is_plot_distance_means:
+            distance_means, distance_stds = get_means_stds(df_distance)        
+            if distance_error_type is None:
+                distance_stds = None
 
     if df_length is not None:
         df_length = df_length.loc[
@@ -156,6 +170,8 @@ if (is_plot_distance and df_distance is not None) or (
         if is_half_length:
             df_length = df_length.applymap(half)
         length_means, length_stds = get_means_stds(df_length)
+        if length_error_type is None:
+            length_stds = None
     else:
         length_means = None
         length_stds = None
