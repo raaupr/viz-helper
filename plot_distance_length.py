@@ -314,7 +314,7 @@ def create_plot(
                     length_means - length_stds,
                     length_means + length_stds,
                     color=l_line_color,
-                    alpha=0.2
+                    alpha=0.2,
                 )
             plt.plot(
                 df_length.index,

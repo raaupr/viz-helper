@@ -5,15 +5,15 @@ import os
 import streamlit as st
 
 from plot_distance_length import (
-    DEFAULT_HEX_LIST,
-    DEFAULT_PROPORTION_LIST,
     create_plot,
-    get_distance_cmap,
     get_means_error,
     half,
     read_file,
 )
-from util_colormap import get_colormap_plot
+from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
+
+DEFAULT_HEX_LIST = ["#FFBA08", "#D00000", "#03071E", "#D00000", "#FFBA08"]
+DEFAULT_FLOAT_LIST = [-3.0, -1.0, 0.0, 1.0, 3.0]
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
 
@@ -164,21 +164,52 @@ if (is_plot_distance and df_distance is not None) or (
         st.sidebar.subheader("Distance colormap")
         cmap_plot = st.sidebar.empty()
         hex_list = None
-        proportion_list = None
-        distance_min = st.sidebar.number_input("Min value:", value=-3)
-        distance_max = st.sidebar.number_input("Max value:", value=3)
+        float_list = None
+        distance_min = st.sidebar.number_input("Min value:", value=-3.0)
+        distance_max = st.sidebar.number_input("Max value:", value=3.0)
         if hex_list is None:
             hex_list = DEFAULT_HEX_LIST
-            proportion_list = DEFAULT_PROPORTION_LIST
+            float_list = DEFAULT_FLOAT_LIST
         else:
             hex_list = hex_list.split(",")
         st.sidebar.write("Distance scatter plot colormap:")
-        for i in range(len(hex_list)):
-            hex_list[i] = st.sidebar.color_picker(f"Color {i}", value=hex_list[i])
-            proportion_list[i] = st.sidebar.number_input(
-                f"Proportion {i}", value=proportion_list[i]
-            )
-        distance_cmap = get_distance_cmap(hex_list, proportion_list)
+        nb_colormap = st.sidebar.number_input("Number of colors", value=len(hex_list))
+        new_hex_list = []
+        new_float_list = []
+        for i in range(nb_colormap):
+            if i < len(hex_list):
+                hex_val = hex_list[i]
+                hex = st.sidebar.color_picker(f"Color {i}", value=hex_val)
+                if i == 0:
+                    val = st.sidebar.number_input(
+                        f"Point value {i}", value=distance_min, min_value=distance_min, max_value=distance_min
+                    )    
+                elif i == nb_colormap - 1:
+                    val = st.sidebar.number_input(
+                        f"Point value {i}", value=distance_max, min_value=distance_max, max_value=distance_max
+                    )
+                else:
+                    float_val = max(max(distance_min, float_list[i]), min(distance_max, float_list[i]))
+                    val = st.sidebar.number_input(
+                        f"Point value {i}", value=float_val, min_value=distance_min, max_value=distance_max
+                    )
+            else:
+                hex = st.sidebar.color_picker(f"Color {i}")
+                if i == 0:
+                    val = st.sidebar.number_input(
+                        f"Point value {i}", value=distance_min, min_value=distance_min, max_value=distance_min
+                    )    
+                elif i == nb_colormap - 1:
+                    val = st.sidebar.number_input(
+                        f"Point value {i}", value=distance_max, min_value=distance_max, max_value=distance_max
+                    )
+                else:
+                    val = st.sidebar.number_input(f"Point value {i}", min_value=distance_min, max_value=distance_max)
+            new_hex_list.append(hex)
+            new_float_list.append(val)
+        hex_list = new_hex_list
+        float_list = new_float_list
+        distance_cmap = get_continuous_cmap_bypoint(hex_list, float_list)
         cmap_plot.pyplot(get_colormap_plot(distance_cmap, distance_min, distance_max))
     else:
         distance_cmap = None

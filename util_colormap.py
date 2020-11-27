@@ -1,5 +1,7 @@
 """ Colormap creator & viewer.
-Creator from https://github.com/KerryHalupka/custom_colormap."""
+Most codes to create the colormap are from https://github.com/KerryHalupka/custom_colormap."""
+
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,8 +40,9 @@ def get_continuous_cmap(hex_list, float_list=None):
     Returns
     ----------
     colour map"""
+
     rgb_list = [rgb_to_dec(hex_to_rgb(i)) for i in hex_list]
-    if float_list:
+    if float_list is not None:
         pass
     else:
         float_list = list(np.linspace(0, 1, len(rgb_list)))
@@ -53,6 +56,31 @@ def get_continuous_cmap(hex_list, float_list=None):
         cdict[col] = col_list
     cmp = LinearSegmentedColormap("my_cmp", segmentdata=cdict, N=256)
     return cmp
+
+
+def get_continuous_cmap_bypoint(
+    hex_list: List[str], float_list: List[float]
+) -> LinearSegmentedColormap:
+    """creates and returns a color map that can be used in heat map figures.
+    Colour map graduates linearly between each color in hex_list.
+    The float list in this case can be actual data point value,
+    which will be automatically normalized.
+
+    Parameters
+    ----------
+    hex_list : List[str]
+        list of hex code strings
+    float_list : List[float]
+        list of floats, same length as hex_list. Will be normalized to be between 0 and 1.
+
+    Returns
+    -------
+    LinearSegmentedColormap
+        The colormap
+    """
+    x = np.array(float_list)
+    normalized = (x - min(x)) / (max(x) - min(x)).tolist()
+    return get_continuous_cmap(hex_list, normalized)
 
 
 def get_colormap_plot(
@@ -85,8 +113,8 @@ def get_colormap_plot(
         vmax=vmax,
         extent=[vmin, vmax, -1, 1],
     )
-    x_label_list = [vmin, (vmax+vmin)/2, vmax]
-    ax.set_xticks([vmin, (vmax+vmin)/2, vmax])
+    x_label_list = [vmin, (vmax + vmin) / 2, vmax]
+    ax.set_xticks([vmin, (vmax + vmin) / 2, vmax])
     ax.set_xticklabels(x_label_list)
     ax.set_yticks([])
     return fig
