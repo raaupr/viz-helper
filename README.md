@@ -9,7 +9,7 @@ Data visualization scripts for various projects.
     - Unzip the zip file
 3. Install requirements (in terminal, inside the unzipped/cloned folder):
     ```bash
-    pip install -r requirements
+    pip install -r requirements.txt
     ```
 
 ## Run GUI    
