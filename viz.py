@@ -4,9 +4,15 @@ import os
 
 import streamlit as st
 
-from plot_distance_length import (DEFAULT_HEX_LIST, DEFAULT_PROPORTION_LIST,
-                                  create_plot, get_distance_cmap,
-                                  get_means_stds, half, read_file)
+from plot_distance_length import (
+    DEFAULT_HEX_LIST,
+    DEFAULT_PROPORTION_LIST,
+    create_plot,
+    get_distance_cmap,
+    get_means_error,
+    half,
+    read_file,
+)
 from util_colormap import get_colormap_plot
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
@@ -30,14 +36,18 @@ if is_plot_distance:
         st.info(
             f"Reading distance file successful: found {len(df_distance.columns)} data points."
         )
-        is_plot_distance_means = st.sidebar.checkbox("Plot distance means", value="True")
-        distance_error_type = st.sidebar.selectbox("Error bar type", ["None", "Standard Deviation"], key="distance_error_type")
+        is_plot_distance_means = st.sidebar.checkbox(
+            "Plot distance means", value="True"
+        )
+        distance_error_type = st.sidebar.selectbox(
+            "Error bar type", ["None", "SD", "SEM"], key="distance_error_type"
+        )
         if distance_error_type == "None":
             distance_error_type = None
     else:
         st.warning("\u2190 Please select the distance dataset file.")
         st.sidebar.warning("Please select the distance dataset file.")
-st.sidebar.header("Length")        
+st.sidebar.header("Length")
 df_length = None
 is_plot_length = st.sidebar.checkbox("Plot length")
 is_half_length = False
@@ -54,7 +64,9 @@ if is_plot_length:
         is_half_length = st.sidebar.checkbox(
             "Make length plot symmetrical w.r.t. the center", value=True
         )
-        length_error_type = st.sidebar.selectbox("Error bar type", ["None", "Standard Deviation"], key="length_error_type")
+        length_error_type = st.sidebar.selectbox(
+            "Error bar type", ["None", "SD", "SEM"], key="length_error_type"
+        )
         if length_error_type == "None":
             length_error_type = None
     else:
@@ -107,10 +119,22 @@ if (is_plot_distance and df_distance is not None) or (
     plot_width = st.sidebar.number_input("Plot width:", value=20)
     plot_height = st.sidebar.number_input("Plot height:", value=10)
     distance_size = 40
+    d_means_size, d_error_size, l_means_size, l_error_size = 2, 2, 2, 2
+    marker = 'o'
     if df_distance is not None:
-        marker = st.sidebar.text_input("Marker type for distance points", value='o')
-        st.sidebar.markdown("See [here](https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/marker_reference.html) for possible marker types")
+        marker = st.sidebar.text_input("Marker type for distance points", value="o")
+        st.sidebar.markdown(
+            "See [here](https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/marker_reference.html) for possible marker types"
+        )
         distance_size = st.sidebar.number_input("Size of distance points", value=40)
+    if is_plot_distance_means:
+        d_means_size = st.sidebar.number_input("Distance means line width", value=2)
+        if distance_error_type is not None:
+            d_error_size = st.sidebar.number_input("Distance error line width", value=2)
+    if is_plot_length:
+        l_means_size = st.sidebar.number_input("Length means line width", value=2)
+        if length_error_type is not None:
+            l_error_size = st.sidebar.number_input("Length error line width", value=2)
 
     st.sidebar.header("Elements:")
     if df_distance is not None:
@@ -132,7 +156,9 @@ if (is_plot_distance and df_distance is not None) or (
         length_color = None
     distance_border = "face"
     if df_distance is not None:
-        use_distance_border = st.sidebar.checkbox("Use border on distance marker points")
+        use_distance_border = st.sidebar.checkbox(
+            "Use border on distance marker points"
+        )
         if use_distance_border:
             distance_border = st.sidebar.color_picker("Distance borders")
         st.sidebar.subheader("Distance colormap")
@@ -167,9 +193,9 @@ if (is_plot_distance and df_distance is not None) or (
         ]
         min_distance_points = df_distance.apply(lambda x: x.count(), axis=1).min()
         if is_plot_distance_means:
-            distance_means, distance_stds = get_means_stds(df_distance)        
-            if distance_error_type is None:
-                distance_stds = None
+            distance_means, distance_stds = get_means_error(
+                df_distance, distance_error_type
+            )
 
     if df_length is not None:
         df_length = df_length.loc[
@@ -178,9 +204,8 @@ if (is_plot_distance and df_distance is not None) or (
         min_length_points = df_length.apply(lambda x: x.count(), axis=1).min()
         if is_half_length:
             df_length = df_length.applymap(half)
-        length_means, length_stds = get_means_stds(df_length)
-        if length_error_type is None:
-            length_stds = None
+        length_means, length_stds = get_means_error(df_length, length_error_type)
+
     else:
         length_means = None
         length_stds = None
@@ -194,11 +219,15 @@ if (is_plot_distance and df_distance is not None) or (
         distance_color,
         distance_size,
         distance_border,
+        d_means_size,
+        d_error_size,
         df_length,
         is_half_length,
         length_means,
         length_stds,
         length_color,
+        l_means_size,
+        l_error_size,
         distance_cmap,
         distance_min,
         distance_max,
@@ -215,13 +244,13 @@ if (is_plot_distance and df_distance is not None) or (
         ylabel_size,
         xticks_size,
         yticks_size,
-        marker
+        marker,
     )
 
     outfile = st.text_input(
         "Save as:", value=os.path.join(os.path.abspath(os.getcwd()), "plot.eps")
     )
-    allowed_formats = ['.jpg', '.png', '.eps']
+    allowed_formats = [".jpg", ".png", ".eps"]
     if st.button("Save"):
         if outfile[-4:] in allowed_formats:
             plt.savefig(outfile)
@@ -230,9 +259,11 @@ if (is_plot_distance and df_distance is not None) or (
             st.error(
                 f"Plot not saved: save file name can only ends with either '.jpg', '.png' or '.eps'"
             )
-    
+
     if df_distance is not None:
-        st.write(f"Minimum distance data points at each timestamp: {min_distance_points}")
+        st.write(
+            f"Minimum distance data points at each timestamp: {min_distance_points}"
+        )
     if df_length is not None:
         st.write(f"Minimum length data points at each timestamp: {min_length_points}")
 

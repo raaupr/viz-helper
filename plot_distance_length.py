@@ -91,13 +91,17 @@ def half(x: object) -> object:
     return x
 
 
-def get_means_stds(df: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
+def get_means_error(
+    df: pd.DataFrame, error_type: str = "SD"
+) -> Tuple[pd.Series, pd.Series]:
     """Compute the mean and standard deviation of the data.
 
     Parameters
     ----------
     df : pd.DataFrame
         The dataframe containing distance/length data.
+    error_type : str
+        Can be either "SD" or "SEM" (standard dev. or standard means of err.)
 
     Returns
     -------
@@ -105,8 +109,13 @@ def get_means_stds(df: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
         Tuple: means, standard deviation
     """
     means = df.mean(axis=1, skipna=True)
-    stds = df.std(axis=1, skipna=True)
-    return means, stds
+    if error_type is None:
+        err = None
+    elif error_type == "SD":
+        err = df.std(axis=1, skipna=True)
+    elif error_type == "SEM":
+        err = df.sem(axis=1, skipna=True)
+    return means, err
 
 
 def get_distance_cmap(
@@ -150,11 +159,15 @@ def create_plot(
     d_line_color: str,
     d_size: int,
     d_border: str,
+    d_means_size: int,
+    d_err_size: int,
     df_length: pd.DataFrame,
     half_length: bool,
     length_means: pd.Series,
     length_stds: pd.Series,
     l_line_color: str,
+    l_means_size: int,
+    l_err_size: int,
     distance_cmap: LinearSegmentedColormap,
     distance_min: int,
     distance_max: int,
@@ -171,7 +184,7 @@ def create_plot(
     ylabel_size: float,
     xticks_size: float,
     yticks_size: float,
-    marker
+    marker,
 ) -> pyplot:
     """Create plot and save it to a file.
 
@@ -189,6 +202,10 @@ def create_plot(
         Size of the scatter points of the distance.
     d_border : str
         Border color for the scatter points of the distance.
+    d_means_size : float
+        Line size for distance means.
+    d_err_size : float
+        Line size for length error.
     df_length : pd.DataFrame
         DataFrame containing the length data.
     half_length : bool
@@ -199,6 +216,10 @@ def create_plot(
         The length standard deviations.
     l_line_color : str
         Color for the length means & std. dev.
+    l_means_size : float
+        Line size for length means.
+    l_err_size : float
+        Line size for length error.
     distance_cmap : LinearSegmentedColormap
         Colormap for the scatterplot.
     distance_min : int
@@ -265,27 +286,42 @@ def create_plot(
                 df_distance.index,
                 distance_means,
                 yerr=distance_stds,
-                linewidth=2,
+                linewidth=d_means_size,
                 color=d_line_color,
-                elinewidth=2,
+                elinewidth=d_err_size,
                 ecolor=d_line_color,
             )
         elif distance_means is not None:
-            plt.plot(df_distance.index, distance_means, linewidth=2, color=d_line_color)
+            plt.plot(
+                df_distance.index,
+                distance_means,
+                linewidth=d_means_size,
+                color=d_line_color,
+            )
 
     # length
     if df_length is not None:
         if half_length:
-            plt.plot(df_length.index, length_means, color=l_line_color)
+            plt.plot(
+                df_length.index,
+                length_means,
+                color=l_line_color,
+                linewidth=l_means_size,
+            )
             if length_stds is not None:
                 plt.fill_between(
                     df_length.index,
                     length_means - length_stds,
                     length_means + length_stds,
                     color=l_line_color,
-                    alpha=0.2,
+                    alpha=0.2
                 )
-            plt.plot(df_length.index, -length_means, color=l_line_color)
+            plt.plot(
+                df_length.index,
+                -length_means,
+                color=l_line_color,
+                linewidth=l_means_size,
+            )
             if length_stds is not None:
                 plt.fill_between(
                     df_length.index,
@@ -296,15 +332,20 @@ def create_plot(
                 )
         else:
             if length_stds is None:
-                plt.plot(df_length.index, length_means, color=l_line_color)
+                plt.plot(
+                    df_length.index,
+                    length_means,
+                    color=l_line_color,
+                    linewidth=l_means_size,
+                )
             else:
                 plt.errorbar(
                     df_length.index,
                     length_means,
                     yerr=length_stds,
-                    linewidth=2,
+                    linewidth=l_means_size,
                     color=l_line_color,
-                    elinewidth=2,
+                    elinewidth=l_err_size,
                     ecolor=l_line_color,
                 )
 
@@ -411,7 +452,7 @@ def main(
     df_distance = df_distance.loc[
         (df_distance.index >= min_time) & (df_distance.index <= max_time)
     ]
-    distance_means, distance_stds = get_means_stds(df_distance)
+    distance_means, distance_stds = get_means_error(df_distance)
 
     if file_length is not None:
         df_length = read_file(file_length)
@@ -420,7 +461,7 @@ def main(
         ]
         if half_length:
             df_length = df_length.applymap(half)
-        length_means, length_stds = get_means_stds(df_length)
+        length_means, length_stds = get_means_error(df_length)
     else:
         df_length = None
         length_means = None
@@ -444,11 +485,15 @@ def main(
         distance_color,
         distance_size,
         distance_border,
+        2,
+        2,
         df_length,
         half_length,
         length_means,
         length_stds,
         length_color,
+        2,
+        2,
         distance_cmap,
         distance_min,
         distance_max,
@@ -465,7 +510,7 @@ def main(
         10,
         10,
         10,
-        'o'
+        "o",
     )
 
     plt.savefig(outfile)
