@@ -7,6 +7,7 @@ import streamlit as st
 from plot_distance_length import (DEFAULT_HEX_LIST, DEFAULT_PROPORTION_LIST,
                                   create_plot, get_distance_cmap,
                                   get_means_stds, half, read_file)
+from util_colormap import get_colormap_plot
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
 
@@ -92,6 +93,13 @@ if (is_plot_distance and df_distance is not None) or (
     if df_distance is not None:
         distance_size = st.sidebar.number_input("Size of distance circles", value=40)
 
+    st.sidebar.header("Elements:")
+    if df_distance is not None:
+        show_colorbar = st.sidebar.checkbox("Show color bar")
+    else:
+        show_colorbar = False
+    show_grid = st.sidebar.checkbox("Show grid")
+
     st.sidebar.header("Colors:")
     if df_distance is not None:
         distance_color = st.sidebar.color_picker(
@@ -108,25 +116,29 @@ if (is_plot_distance and df_distance is not None) or (
         use_distance_border = st.sidebar.checkbox("Use distance circle border")
         if use_distance_border:
             distance_border = st.sidebar.color_picker("Distance circle borders")
-
-    st.sidebar.header("Elements:")
-    if df_distance is not None:
-        show_colorbar = st.sidebar.checkbox("Show color bar")
+        st.sidebar.subheader("Distance colormap")
+        cmap_plot = st.sidebar.empty()
+        hex_list = None
+        proportion_list = None
+        distance_min = st.sidebar.number_input("Min value:", value=-3)
+        distance_max = st.sidebar.number_input("Max value:", value=3)
+        if hex_list is None:
+            hex_list = DEFAULT_HEX_LIST
+            proportion_list = DEFAULT_PROPORTION_LIST
+        else:
+            hex_list = hex_list.split(",")
+        st.sidebar.write("Distance scatter plot colormap:")
+        for i in range(len(hex_list)):
+            hex_list[i] = st.sidebar.color_picker(f"Color {i}", value=hex_list[i])
+            proportion_list[i] = st.sidebar.number_input(
+                f"Proportion {i}", value=proportion_list[i]
+            )
+        distance_cmap = get_distance_cmap(hex_list, proportion_list)
+        cmap_plot.pyplot(get_colormap_plot(distance_cmap, distance_min, distance_max))
     else:
-        show_colorbar = False
-    show_grid = st.sidebar.checkbox("Show grid")
-
-    hex_list = None
-    proportion_list = None
-    distance_min = -3
-    distance_max = 3
-
-    if hex_list is None:
-        hex_list = DEFAULT_HEX_LIST
-        proportion_list = DEFAULT_PROPORTION_LIST
-    else:
-        hex_list = hex_list.split(",")
-    distance_cmap = get_distance_cmap(hex_list, proportion_list)
+        distance_cmap = None
+        distance_min = -3
+        distance_max = 3
 
     if df_distance is not None:
         df_distance = df_distance.loc[
