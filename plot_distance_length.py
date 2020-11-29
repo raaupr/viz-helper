@@ -109,7 +109,7 @@ def get_means_error(
         Tuple: means, standard deviation
     """
     means = df.mean(axis=1, skipna=True)
-    if error_type is None:
+    if error_type is None or error_type.lower() == "none":
         err = None
     elif error_type == "SD":
         err = df.std(axis=1, skipna=True)
