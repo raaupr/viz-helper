@@ -51,7 +51,7 @@ if config["DISTANCE"]["plot_distance"]:
             "Plot distance means", value=config["DISTANCE"]["plot_distance_means"]
         )
         config["DISTANCE"]["means_error_type"] = st.sidebar.selectbox(
-            "Error bar type", ERROR_BAR_TYPES, key="d_error_type", index=ERROR_BAR_TYPES.index(config["DISTANCE"]["means_error_type"])
+            "Error bar type:", ERROR_BAR_TYPES, key="d_error_type", index=ERROR_BAR_TYPES.index(config["DISTANCE"]["means_error_type"])
         )
     else:
         st.warning("\u2190 Please select the distance dataset file.")
@@ -72,7 +72,7 @@ if config["LENGTH"]["plot_length_means"]:
             "Make length plot symmetrical w.r.t. the center", value=config["LENGTH"]["half_symmetric_length"]
         )
         config["LENGTH"]["means_error_type"] = st.sidebar.selectbox(
-            "Error bar type", ERROR_BAR_TYPES, key="l_error_type", index=ERROR_BAR_TYPES.index(config["LENGTH"]["means_error_type"])
+            "Error bar type:", ERROR_BAR_TYPES, key="l_error_type", index=ERROR_BAR_TYPES.index(config["LENGTH"]["means_error_type"])
         )
     else:
         st.warning("\u2190 Please select the length dataset file.")
@@ -113,39 +113,40 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     config["PLOT"]["ylim_max"] = st.sidebar.number_input("Max value:", value=config["PLOT"]["ylim_max"])
 
     st.sidebar.header("Texts:")
-    config["PLOT"]["title"] = st.sidebar.text_input("title:", value=config["PLOT"]["title"])
-    config["PLOT"]["title_size"] = st.sidebar.number_input("title size", value=config["PLOT"]["title_size"], min_value=0.0)
+    config["PLOT"]["title"] = st.sidebar.text_input("Title:", value=config["PLOT"]["title"])
     config["PLOT"]["xlabel"] = st.sidebar.text_input(
         "x-axis label:", value=config["PLOT"]["xlabel"]
     )
-    config["PLOT"]["xlabel_size"] = st.sidebar.number_input("x-axis label size", value=config["PLOT"]["xlabel_size"], min_value=0.0)
-    config["PLOT"]["xticks_size"] = st.sidebar.number_input("x-axis tick labels size", value=config["PLOT"]["xticks_size"], min_value=0.0)
     config["PLOT"]["ylabel"] = st.sidebar.text_input(
         "y-axis label:", value=config["PLOT"]["ylabel"]
     )
-    config["PLOT"]["ylabel_size"] = st.sidebar.number_input("y-axis label size", value=config["PLOT"]["ylabel_size"], min_value=0.0)
-    config["PLOT"]["yticks_size"] = st.sidebar.number_input("y-axis tick labels size", value=config["PLOT"]["yticks_size"], min_value=0.0)
 
     st.sidebar.header("Sizes:")
+    config["PLOT"]["title_size"] = st.sidebar.number_input("Title size:", value=config["PLOT"]["title_size"], min_value=0.0)
+    config["PLOT"]["xlabel_size"] = st.sidebar.number_input("x-axis label size:", value=config["PLOT"]["xlabel_size"], min_value=0.0)
+    config["PLOT"]["xticks_size"] = st.sidebar.number_input("x-axis tick labels size:", value=config["PLOT"]["xticks_size"], min_value=0.0)
+    config["PLOT"]["ylabel_size"] = st.sidebar.number_input("y-axis label size:", value=config["PLOT"]["ylabel_size"], min_value=0.0)
+    config["PLOT"]["yticks_size"] = st.sidebar.number_input("y-axis tick labels size:", value=config["PLOT"]["yticks_size"], min_value=0.0)
     config["PLOT"]["width"] = st.sidebar.number_input("Plot width:", value=config["PLOT"]["width"], min_value=0.0)
     config["PLOT"]["height"] = st.sidebar.number_input("Plot height:", value=config["PLOT"]["height"], min_value=0.0)
     
     if df_distance is not None:
-        config["DISTANCE"]["point_type"] = st.sidebar.text_input("Marker type for distance points", value=config["DISTANCE"]["point_type"])
+        config["DISTANCE"]["point_size"] = st.sidebar.number_input("Size of distance points:", value=config["DISTANCE"]["point_size"], min_value=0.0)
+    if config["DISTANCE"]["plot_distance_means"]:
+        config["DISTANCE"]["means_size"] = st.sidebar.number_input("Distance means line width:", value=config["DISTANCE"]["means_size"], min_value=0.0)
+        if config["DISTANCE"]["means_error_type"] != "None":
+            config["DISTANCE"]["error_size"] = st.sidebar.number_input("Distance error line width:", value=config["DISTANCE"]["error_size"], min_value=0.0)
+    if config["LENGTH"]["plot_length_means"]:
+        config["LENGTH"]["means_size"] = st.sidebar.number_input("Length means line width:", value=config["LENGTH"]["means_size"], min_value=0.0)
+        if config["LENGTH"]["means_error_type"] != "None":
+            config["LENGTH"]["error_size"] = st.sidebar.number_input("Length error line width:", value=config["LENGTH"]["error_size"], min_value=0.0)
+
+    st.sidebar.header("Elements:")
+    if df_distance is not None:
+        config["DISTANCE"]["point_type"] = st.sidebar.text_input("Marker type for distance points:", value=config["DISTANCE"]["point_type"])
         st.sidebar.markdown(
             "See [here](https://matplotlib.org/api/markers_api.html) for possible marker types"
         )
-        config["DISTANCE"]["point_size"] = st.sidebar.number_input("Size of distance points", value=config["DISTANCE"]["point_size"], min_value=0.0)
-    if config["DISTANCE"]["plot_distance_means"]:
-        config["DISTANCE"]["means_size"] = st.sidebar.number_input("Distance means line width", value=config["DISTANCE"]["means_size"], min_value=0.0)
-        if config["DISTANCE"]["means_error_type"] != "None":
-            config["DISTANCE"]["error_size"] = st.sidebar.number_input("Distance error line width", value=config["DISTANCE"]["error_size"], min_value=0.0)
-    if config["LENGTH"]["plot_length_means"]:
-        config["LENGTH"]["means_size"] = st.sidebar.number_input("Length means line width", value=config["LENGTH"]["means_size"], min_value=0.0)
-        if config["LENGTH"]["means_error_type"] != "None":
-            config["LENGTH"]["error_size"] = st.sidebar.number_input("Length error line width", value=config["LENGTH"]["error_size"], min_value=0.0)
-
-    st.sidebar.header("Elements:")
     if df_distance is not None:
         config["DISTANCE"]["show_colorbar"] = st.sidebar.checkbox("Show color bar", value=config["DISTANCE"]["show_colorbar"])
     config["PLOT"]["show_grid"] = st.sidebar.checkbox("Show grid", value = config["PLOT"]["show_grid"])
@@ -167,9 +168,9 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         )
         if config["DISTANCE"]["point_use_border"]:
             if config["DISTANCE"]["point_border_color"] != "face":
-                config["DISTANCE"]["point_border_color"] = st.sidebar.color_picker("Distance borders", value = config["DISTANCE"]["point_border_color"])
+                config["DISTANCE"]["point_border_color"] = st.sidebar.color_picker("Distance borders:", value = config["DISTANCE"]["point_border_color"])
             else:
-                config["DISTANCE"]["point_border_color"] = st.sidebar.color_picker("Distance borders")
+                config["DISTANCE"]["point_border_color"] = st.sidebar.color_picker("Distance borders:")
         if not config["DISTANCE"]["point_use_border"]:
             config["DISTANCE"]["point_border_color"] = "face"
 
@@ -179,24 +180,24 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         config["DISTANCE"]["colormap_max"] = st.sidebar.number_input("Max value:", value=config["DISTANCE"]["colormap_max"], min_value = config["DISTANCE"]["colormap_min"] + 0.1)
 
         st.sidebar.write("Distance scatter plot colormap:")
-        nb_colormap = st.sidebar.number_input("Number of colors", value=len(config["DISTANCE"]["colormap_hex"]))
-        st.write("Colors: (point values should be in increasing order)")
+        nb_colormap = st.sidebar.number_input("Number of colors:", value=len(config["DISTANCE"]["colormap_hex"]))
+        st.sidebar.write("Colors: (point values should be in increasing order)")
         new_d_colormap_hex = []
         new_d_colormap_float = []
         for i in range(nb_colormap):
             if i < len(config["DISTANCE"]["colormap_hex"]):
                 hex_val = config["DISTANCE"]["colormap_hex"][i]
-                hex = st.sidebar.color_picker(f"Color {i}", value=hex_val)
+                hex = st.sidebar.color_picker(f"Color {i}:", value=hex_val)
                 if i == 0:
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=config["DISTANCE"]["colormap_min"], 
                         min_value=config["DISTANCE"]["colormap_min"], 
                         max_value=config["DISTANCE"]["colormap_min"]
                     )    
                 elif i == nb_colormap - 1:
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=config["DISTANCE"]["colormap_max"], 
                         min_value=config["DISTANCE"]["colormap_max"], 
                         max_value=config["DISTANCE"]["colormap_max"]
@@ -206,30 +207,30 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
                         max(config["DISTANCE"]["colormap_min"], config["DISTANCE"]["colormap_float"][i]), 
                         min(config["DISTANCE"]["colormap_max"], config["DISTANCE"]["colormap_float"][i]))
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=float_val, 
                         min_value=config["DISTANCE"]["colormap_min"], 
                         max_value=config["DISTANCE"]["colormap_max"]
                     )
             else:
-                hex = st.sidebar.color_picker(f"Color {i}")
+                hex = st.sidebar.color_picker(f"Color {i}:")
                 if i == 0:
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=config["DISTANCE"]["colormap_min"], 
                         min_value=config["DISTANCE"]["colormap_min"], 
                         max_value=config["DISTANCE"]["colormap_min"]
                     )    
                 elif i == nb_colormap - 1:
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=config["DISTANCE"]["colormap_max"], 
                         min_value=config["DISTANCE"]["colormap_max"], 
                         max_value=config["DISTANCE"]["colormap_max"]
                     )
                 else:
                     val = st.sidebar.number_input(
-                        f"Point value {i}", 
+                        f"Point value {i}:", 
                         value=config["DISTANCE"]["colormap_max"], 
                         min_value=config["DISTANCE"]["colormap_min"],
                         max_value=config["DISTANCE"]["colormap_max"])
@@ -267,42 +268,43 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
 
     # st.header("Plot")
 
-    plt = create_plot(
-        df_distance,
-        distance_means,
-        distance_stds,
-        config["DISTANCE"]["means_color"],
-        config["DISTANCE"]["error_color"],
-        config["DISTANCE"]["point_size"],
-        config["DISTANCE"]["point_border_color"],
-        config["DISTANCE"]["means_size"],
-        config["DISTANCE"]["error_size"],
-        df_length,
-        config["LENGTH"]["half_symmetric_length"],
-        length_means,
-        length_stds,
-        config["LENGTH"]["means_color"],
-        config["LENGTH"]["error_color"],
-        config["LENGTH"]["means_size"],
-        config["LENGTH"]["error_size"],
-        distance_cmap,
-        config["DISTANCE"]["colormap_min"],
-        config["DISTANCE"]["colormap_max"],
-        config["PLOT"]["width"],
-        config["PLOT"]["height"],
-        config["DISTANCE"]["show_colorbar"],
-        config["PLOT"]["show_grid"],
-        (config["PLOT"]["ylim_min"], config["PLOT"]["ylim_max"]),
-        config["PLOT"]["title"],
-        config["PLOT"]["xlabel"],
-        config["PLOT"]["ylabel"],
-        config["PLOT"]["title_size"],
-        config["PLOT"]["xlabel_size"],
-        config["PLOT"]["ylabel_size"],
-        config["PLOT"]["xticks_size"],
-        config["PLOT"]["yticks_size"],
-        config["DISTANCE"]["point_type"],
-    )
+    with st.spinner("Creating plot..."):
+        plt = create_plot(
+            df_distance,
+            distance_means,
+            distance_stds,
+            config["DISTANCE"]["means_color"],
+            config["DISTANCE"]["error_color"],
+            config["DISTANCE"]["point_size"],
+            config["DISTANCE"]["point_border_color"],
+            config["DISTANCE"]["means_size"],
+            config["DISTANCE"]["error_size"],
+            df_length,
+            config["LENGTH"]["half_symmetric_length"],
+            length_means,
+            length_stds,
+            config["LENGTH"]["means_color"],
+            config["LENGTH"]["error_color"],
+            config["LENGTH"]["means_size"],
+            config["LENGTH"]["error_size"],
+            distance_cmap,
+            config["DISTANCE"]["colormap_min"],
+            config["DISTANCE"]["colormap_max"],
+            config["PLOT"]["width"],
+            config["PLOT"]["height"],
+            config["DISTANCE"]["show_colorbar"],
+            config["PLOT"]["show_grid"],
+            (config["PLOT"]["ylim_min"], config["PLOT"]["ylim_max"]),
+            config["PLOT"]["title"],
+            config["PLOT"]["xlabel"],
+            config["PLOT"]["ylabel"],
+            config["PLOT"]["title_size"],
+            config["PLOT"]["xlabel_size"],
+            config["PLOT"]["ylabel_size"],
+            config["PLOT"]["xticks_size"],
+            config["PLOT"]["yticks_size"],
+            config["DISTANCE"]["point_type"],
+        )
 
     config["PLOT"]["save_file"] = st.text_input(
         "Save as:", value=config["PLOT"]["save_file"]
