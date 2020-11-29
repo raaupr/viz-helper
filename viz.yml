@@ -9,6 +9,7 @@ DISTANCE:
   means_size: 2.0
   error_size: 2.0
   means_color: "#FFA500"
+  error_color: "#FFA500"
   colormap_min: -3.0
   colormap_max: 3.0
   colormap_hex: 
@@ -32,6 +33,7 @@ LENGTH:
   means_size: 2.0
   error_size: 2.0
   means_color: "#008000"
+  error_color: "#008000"
 
 PLOT:
   xlim_min: -99999999

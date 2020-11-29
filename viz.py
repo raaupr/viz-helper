@@ -155,10 +155,14 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     st.sidebar.header("Colors:")
     if df_distance is not None and config["DISTANCE"]["plot_distance_means"]:
         config["DISTANCE"]["means_color"] = st.sidebar.color_picker(
-            "Distance means & std:", value=config["DISTANCE"]["means_color"]
+            "Distance means:", value=config["DISTANCE"]["means_color"]
+        )
+        config["DISTANCE"]["error_color"] = st.sidebar.color_picker(
+            "Distance means error:", value=config["DISTANCE"]["error_color"]
         )
     if df_length is not None:
-        config["LENGTH"]["means_color"] = st.sidebar.color_picker("Length means & std:", value=config["LENGTH"]["means_color"])
+        config["LENGTH"]["means_color"] = st.sidebar.color_picker("Length means:", value=config["LENGTH"]["means_color"])
+        config["LENGTH"]["error_color"] = st.sidebar.color_picker("Length means error:", value=config["LENGTH"]["error_color"])
     if df_distance is not None:
         config["DISTANCE"]["point_use_border"] = st.sidebar.checkbox(
             "Use border on distance marker points", value = config["DISTANCE"]["point_use_border"]
@@ -270,6 +274,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         distance_means,
         distance_stds,
         config["DISTANCE"]["means_color"],
+        config["DISTANCE"]["error_color"],
         config["DISTANCE"]["point_size"],
         config["DISTANCE"]["point_border_color"],
         config["DISTANCE"]["means_size"],
@@ -279,6 +284,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         length_means,
         length_stds,
         config["LENGTH"]["means_color"],
+        config["LENGTH"]["error_color"],
         config["LENGTH"]["means_size"],
         config["LENGTH"]["error_size"],
         distance_cmap,

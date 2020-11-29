@@ -157,6 +157,7 @@ def create_plot(
     distance_means: pd.Series,
     distance_stds: pd.Series,
     d_line_color: str,
+    d_error_color: str,
     d_size: int,
     d_border: str,
     d_means_size: int,
@@ -166,6 +167,7 @@ def create_plot(
     length_means: pd.Series,
     length_stds: pd.Series,
     l_line_color: str,
+    l_error_color: str,
     l_means_size: int,
     l_err_size: int,
     distance_cmap: LinearSegmentedColormap,
@@ -197,7 +199,9 @@ def create_plot(
     distance_stds : pd.Series
         The distance standard deviations.
     d_line_color : str
-        Color for the distance means & std. dev.
+        Color for the distance means.
+    d_error_color : str
+        Color for the distance std. dev.
     d_size : int
         Size of the scatter points of the distance.
     d_border : str
@@ -215,7 +219,9 @@ def create_plot(
     length_stds : pd.Series
         The length standard deviations.
     l_line_color : str
-        Color for the length means & std. dev.
+        Color for the length means.
+    l_error_color : str
+        Color for the length std. dev.
     l_means_size : float
         Line size for length means.
     l_err_size : float
@@ -289,7 +295,7 @@ def create_plot(
                 linewidth=d_means_size,
                 color=d_line_color,
                 elinewidth=d_err_size,
-                ecolor=d_line_color,
+                ecolor=d_error_color,
             )
         elif distance_means is not None:
             plt.plot(
@@ -313,7 +319,7 @@ def create_plot(
                     df_length.index,
                     length_means - length_stds,
                     length_means + length_stds,
-                    color=l_line_color,
+                    color=l_error_color,
                     alpha=0.2,
                 )
             plt.plot(
@@ -327,7 +333,7 @@ def create_plot(
                     df_length.index,
                     -length_means - length_stds,
                     -length_means + length_stds,
-                    color=l_line_color,
+                    color=l_error_color,
                     alpha=0.2,
                 )
         else:
@@ -346,7 +352,7 @@ def create_plot(
                     linewidth=l_means_size,
                     color=l_line_color,
                     elinewidth=l_err_size,
-                    ecolor=l_line_color,
+                    ecolor=l_error_color,
                 )
 
     plt.title(title, size=title_size)
@@ -373,7 +379,9 @@ def main(
     min_time: int = -500,
     max_time: int = 0,
     distance_color: str = "orange",
+    distance_error_color: str = "orange",
     length_color: str = "green",
+    length_error_color: str = "green",
     distance_size: int = 40,
     distance_border: str = "face",
     plot_width: int = 20,
@@ -411,9 +419,13 @@ def main(
     max_time : int, optional
         The maximum time relative to anaphase onset that should be included, by default 0.
     distance_color : str, optional
-        The color for distance means & std dev, by default 'orange'. It can accept standard colors.
+        The color for distance means, by default 'orange'. It can accept standard colors.
+    distance_error_color : str, optional
+        The color for distance std dev, by default 'orange'. It can accept standard colors.
     length_color : str, optional
-        The color for distance means & std dev, by default 'green'. It can accept standard colors.
+        The color for distance means, by default 'green'. It can accept standard colors.
+    length_error_color : str, optional
+        The color for distance std dev, by default 'green'. It can accept standard colors.
     distance_size : int, optional
         The size for distance data points, by default 40.
     distance_border : str, optional
@@ -483,6 +495,7 @@ def main(
         distance_means,
         distance_stds,
         distance_color,
+        distance_error_color,
         distance_size,
         distance_border,
         2,
@@ -492,6 +505,7 @@ def main(
         length_means,
         length_stds,
         length_color,
+        length_error_color,
         2,
         2,
         distance_cmap,
