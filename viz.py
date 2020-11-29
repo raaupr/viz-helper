@@ -74,8 +74,6 @@ if config["LENGTH"]["plot_length_means"]:
         config["LENGTH"]["means_error_type"] = st.sidebar.selectbox(
             "Error bar type", ERROR_BAR_TYPES, key="l_error_type", index=ERROR_BAR_TYPES.index(config["LENGTH"]["means_error_type"])
         )
-        if config["LENGTH"]["means_error_type"] == "None":
-            config["LENGTH"]["means_error_type"] = None
     else:
         st.warning("\u2190 Please select the length dataset file.")
         st.sidebar.warning("Please select the length dataset file.")
