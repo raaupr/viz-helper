@@ -89,14 +89,15 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     st.sidebar.header("Ranges:")
     st.sidebar.subheader("x-axis")
     if df_distance is not None:
-        min_default = df_distance.index[0]
-        max_default = df_distance.index[-1]
+        min_default = min(df_distance.index)
+        max_default = max(df_distance.index)
         if df_length is not None:
-            min_default = min(min_default, df_length.index[0])
-            max_default = max(max_default, df_length.index[-1])
-    else:
-        min_default = df_length.index[0]
-        max_default = df_length.index[-1]
+            min_default = min(min_default, min(df_length.index))
+            max_default = max(max_default, max(df_length.index))
+    if df_length is not None:
+        min_default = min(df_length.index)
+        max_default = max(df_length.index)
+            
     xlim_min = config["PLOT"]["xlim_min"]
     xlim_max = config["PLOT"]["xlim_max"]
     if  xlim_min > min_default and xlim_min < max_default:
