@@ -17,6 +17,7 @@ ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
+st.write("v.30112020")
 
 st.set_option("deprecation.showfileUploaderEncoding", False)
 
