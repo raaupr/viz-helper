@@ -27,6 +27,7 @@ DISTANCE:
     - 1.0
     - 3.0
   show_colorbar: False
+  colorbar_ticks_size: 10.0
 
 LENGTH:
   plot_length_means: False

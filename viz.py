@@ -13,7 +13,7 @@ from plot_distance_length import (
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1
+VERSION = 1.1
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
@@ -34,10 +34,12 @@ fin_config = st.sidebar.file_uploader(
 if fin_config:
     config = yaml.load(fin_config, Loader=yaml.Loader)
     st.info("Configuration file loaded")
-    if 'VERSION' not in config or config['VERSION'] < VERSION:
+    if 'VERSION' not in config:
         # -- backward compatibility, add non-existing configs in prev version
         config['PLOT']['xticks_interval'] = 100.0
         config['PLOT']['yticks_interval'] = 1.0
+    if 'VERSION' not in config or config['VERSION'] < 1.1:
+        config['DISTANCE']['colorbar_ticks_size'] = 10.0
         # -- bump version
         config['VERSION'] = VERSION
 
@@ -156,6 +158,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         config["LENGTH"]["means_size"] = st.sidebar.number_input("Length means line width:", value=config["LENGTH"]["means_size"], min_value=0.0)
         if config["LENGTH"]["means_error_type"] != "None":
             config["LENGTH"]["error_size"] = st.sidebar.number_input("Length error line width:", value=config["LENGTH"]["error_size"], min_value=0.0)
+    if df_distance is not None and config["DISTANCE"]["show_colorbar"]:
+        config["DISTANCE"]["colorbar_ticks_size"] = st.sidebar.number_input("Colorbar ticks size:", value=config["DISTANCE"]["colorbar_ticks_size"], min_value=0.0)
 
     st.sidebar.header("Elements:")
     if df_distance is not None:
@@ -178,6 +182,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     if df_length is not None:
         config["LENGTH"]["means_color"] = st.sidebar.color_picker("Length means:", value=config["LENGTH"]["means_color"])
         config["LENGTH"]["error_color"] = st.sidebar.color_picker("Length means error:", value=config["LENGTH"]["error_color"])
+    distance_cmap = get_continuous_cmap_bypoint(config["DISTANCE"]["colormap_hex"], config["DISTANCE"]["colormap_float"])
     if df_distance is not None:
         config["DISTANCE"]["point_use_border"] = st.sidebar.checkbox(
             "Use border on distance marker points", value = config["DISTANCE"]["point_use_border"]
@@ -309,6 +314,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
             config["PLOT"]["width"],
             config["PLOT"]["height"],
             config["DISTANCE"]["show_colorbar"],
+            config["DISTANCE"]["colorbar_ticks_size"],
             config["PLOT"]["show_grid"],
             (config["PLOT"]["xlim_min"], config["PLOT"]["xlim_max"]),
             (config["PLOT"]["ylim_min"], config["PLOT"]["ylim_max"]),

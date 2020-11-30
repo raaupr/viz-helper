@@ -176,6 +176,7 @@ def create_plot(
     width: float,
     height: float,
     show_colorbar: bool,
+    cbar_ticks_size: float,
     show_grid: bool,
     xlim: Tuple[int, int],
     ylim: Tuple[int, int],
@@ -241,6 +242,8 @@ def create_plot(
         The height of the image.
     show_colorbar : bool
         Whether to display colorbar in the image.
+    cbar_ticks_size: float
+        Size of colorbar ticks
     show_grid : bool
         Whether to display grid in the image.
     x_lim : Tuple[int, int]
@@ -374,8 +377,9 @@ def create_plot(
     plt.yticks(np.arange(ylim[0], ylim[1]+yticks_interval, yticks_interval), 
                 fontsize=yticks_size)
 
-    if show_colorbar:
-        plt.colorbar(sc)
+    if df_distance is not None and show_colorbar:
+        cbar = plt.colorbar(sc)
+        cbar.ax.tick_params(labelsize=cbar_ticks_size) 
     if show_grid:
         plt.grid()
 
@@ -525,6 +529,7 @@ def main(
         plot_width,
         plot_height,
         show_colorbar,
+        10,
         show_grid,
         (min_time, max_time),
         (ylim_min, ylim_max),
