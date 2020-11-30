@@ -1,3 +1,5 @@
+VERSION: 1
+
 DISTANCE:
   plot_distance: False
   plot_distance_means: True
@@ -45,9 +47,11 @@ PLOT:
   xlabel: Time relative to Anaphase Onset (s)
   xlabel_size: 10.0
   xticks_size: 10.0
+  xticks_interval: 1.0
   ylabel: Distance to spindle equator (\u03BCm)
   ylabel_size: 10.0
   yticks_size: 10.0
+  yticks_interval: 1.0
   width: 20.0
   height: 10.0
   show_grid: False

@@ -13,11 +13,12 @@ from plot_distance_length import (
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
+VERSION = 1
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
-st.write("v.30112020.2")
+st.sidebar.write(f"Version: {VERSION}")
 
 st.set_option("deprecation.showfileUploaderEncoding", False)
 
@@ -33,6 +34,12 @@ fin_config = st.sidebar.file_uploader(
 if fin_config:
     config = yaml.load(fin_config, Loader=yaml.Loader)
     st.info("Configuration file loaded")
+    if 'VERSION' not in config or config['VERSION'] < VERSION:
+        # -- backward compatibility, add non-existing configs in prev version
+        config['PLOT']['xticks_interval'] = 100.0
+        config['PLOT']['yticks_interval'] = 1.0
+        # -- bump version
+        config['VERSION'] = VERSION
 
 # -- Get data
 st.sidebar.header("Distance")
@@ -99,7 +106,6 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         max_default = max(df_length.index)
     min_default = float(min_default)
     max_default = float(max_default)
-
     xlim_min = config["PLOT"]["xlim_min"]
     xlim_max = config["PLOT"]["xlim_max"]
     if  xlim_min > min_default and xlim_min < max_default:
@@ -112,9 +118,15 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     config["PLOT"]["xlim_max"] = st.sidebar.number_input(
         "Max time:", min_value=min_default, max_value=max_default, value=max_default
     )
+    config["PLOT"]["xticks_interval"] = st.sidebar.number_input(
+        "x-ticks interval:", value = config["PLOT"]["xticks_interval"]
+    )
     st.sidebar.subheader("y-axis")
     config["PLOT"]["ylim_min"] = st.sidebar.number_input("Min value:", value=config["PLOT"]["ylim_min"])
     config["PLOT"]["ylim_max"] = st.sidebar.number_input("Max value:", value=config["PLOT"]["ylim_max"])
+    config["PLOT"]["yticks_interval"] = st.sidebar.number_input(
+        "y-ticks interval:", value = config["PLOT"]["yticks_interval"]
+    )
 
     st.sidebar.header("Texts:")
     config["PLOT"]["title"] = st.sidebar.text_input("Title:", value=config["PLOT"]["title"])
@@ -298,6 +310,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
             config["PLOT"]["height"],
             config["DISTANCE"]["show_colorbar"],
             config["PLOT"]["show_grid"],
+            (config["PLOT"]["xlim_min"], config["PLOT"]["xlim_max"]),
             (config["PLOT"]["ylim_min"], config["PLOT"]["ylim_max"]),
             config["PLOT"]["title"],
             config["PLOT"]["xlabel"],
@@ -307,6 +320,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
             config["PLOT"]["ylabel_size"],
             config["PLOT"]["xticks_size"],
             config["PLOT"]["yticks_size"],
+            config["PLOT"]["xticks_interval"],
+            config["PLOT"]["yticks_interval"],
             config["DISTANCE"]["point_type"],
         )
 

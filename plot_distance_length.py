@@ -177,6 +177,7 @@ def create_plot(
     height: float,
     show_colorbar: bool,
     show_grid: bool,
+    xlim: Tuple[int, int],
     ylim: Tuple[int, int],
     title: str,
     xlabel: str,
@@ -186,6 +187,8 @@ def create_plot(
     ylabel_size: float,
     xticks_size: float,
     yticks_size: float,
+    xticks_interval: float,
+    yticks_interval: float,
     marker,
 ) -> pyplot:
     """Create plot and save it to a file.
@@ -240,6 +243,8 @@ def create_plot(
         Whether to display colorbar in the image.
     show_grid : bool
         Whether to display grid in the image.
+    x_lim : Tuple[int, int]
+        [min, max] range of the x axis.
     y_lim : Tuple[int, int]
         [min, max] range of the y axis.
     title: str
@@ -258,6 +263,10 @@ def create_plot(
         Size for x tick labels
     yticks_size: float
         Size for y tick labels
+    xticks_interval: float
+        Interval between x ticks
+    yticks_interval: float
+        Interval between y ticks
     marker: str
         Marker style
 
@@ -359,14 +368,16 @@ def create_plot(
     plt.ylabel(ylabel, size=ylabel_size)
     plt.xlabel(xlabel, size=xlabel_size)
 
-    plt.xticks(fontsize=xticks_size)
-    plt.yticks(fontsize=yticks_size)
+    plt.ylim(ylim)
+    plt.xticks(np.arange(xlim[0], xlim[1]+xticks_interval, xticks_interval), 
+                fontsize=xticks_size)
+    plt.yticks(np.arange(ylim[0], ylim[1]+yticks_interval, yticks_interval), 
+                fontsize=yticks_size)
 
     if show_colorbar:
         plt.colorbar(sc)
     if show_grid:
         plt.grid()
-    plt.ylim(ylim)
 
     return plt
 
@@ -515,6 +526,7 @@ def main(
         plot_height,
         show_colorbar,
         show_grid,
+        (min_time, max_time),
         (ylim_min, ylim_max),
         title,
         xlabel,
@@ -524,6 +536,8 @@ def main(
         10,
         10,
         10,
+        100.0,
+        1.0,
         "o",
     )
 
