@@ -17,7 +17,7 @@ ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
-st.write("v.30112020")
+st.write("v.30112020.1")
 
 st.set_option("deprecation.showfileUploaderEncoding", False)
 
@@ -97,7 +97,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     if df_length is not None:
         min_default = min(df_length.index)
         max_default = max(df_length.index)
-            
+
     xlim_min = config["PLOT"]["xlim_min"]
     xlim_max = config["PLOT"]["xlim_max"]
     if  xlim_min > min_default and xlim_min < max_default:
