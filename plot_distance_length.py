@@ -299,41 +299,40 @@ def create_plot(
                 edgecolors=d_border,
             )
         # means & std
-        if distance_means is not None and distance_stds is not None:
-            plt.errorbar(
-                df_distance.index,
-                distance_means,
-                yerr=distance_stds,
-                linewidth=d_means_size,
-                color=d_line_color,
-                elinewidth=d_err_size,
-                ecolor=d_error_color,
-            )
-        elif distance_means is not None:
+        if distance_means is not None:
             plt.plot(
                 df_distance.index,
                 distance_means,
-                linewidth=d_means_size,
                 color=d_line_color,
+                linewidth=d_means_size,
+                zorder=3
             )
+            if distance_stds is not None:
+                plt.fill_between(
+                    df_distance.index,
+                    distance_means - distance_stds,
+                    distance_means + distance_stds,
+                    color=d_error_color,
+                    alpha=0.2,
+                )
 
     # length
     if df_length is not None:
-        if half_length:
-            plt.plot(
+        plt.plot(
+            df_length.index,
+            length_means,
+            color=l_line_color,
+            linewidth=l_means_size,
+        )
+        if length_stds is not None:
+            plt.fill_between(
                 df_length.index,
-                length_means,
-                color=l_line_color,
-                linewidth=l_means_size,
+                length_means - length_stds,
+                length_means + length_stds,
+                color=l_error_color,
+                alpha=0.2,
             )
-            if length_stds is not None:
-                plt.fill_between(
-                    df_length.index,
-                    length_means - length_stds,
-                    length_means + length_stds,
-                    color=l_error_color,
-                    alpha=0.2,
-                )
+        if half_length:
             plt.plot(
                 df_length.index,
                 -length_means,
@@ -347,24 +346,6 @@ def create_plot(
                     -length_means + length_stds,
                     color=l_error_color,
                     alpha=0.2,
-                )
-        else:
-            if length_stds is None:
-                plt.plot(
-                    df_length.index,
-                    length_means,
-                    color=l_line_color,
-                    linewidth=l_means_size,
-                )
-            else:
-                plt.errorbar(
-                    df_length.index,
-                    length_means,
-                    yerr=length_stds,
-                    linewidth=l_means_size,
-                    color=l_line_color,
-                    elinewidth=l_err_size,
-                    ecolor=l_error_color,
                 )
 
     plt.title(title, size=title_size)
