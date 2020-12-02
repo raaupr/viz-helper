@@ -179,8 +179,8 @@ def create_plot(
             if distance_stds is not None:
                 axes[0].fill_between(
                     df_distance.index,
-                    -distance_means - distance_stds,
-                    -distance_means + distance_stds,
+                    distance_means - distance_stds,
+                    distance_means + distance_stds,
                     color='none',
                     alpha=0.2,
                     facecolor=d_error_color,
@@ -203,23 +203,6 @@ def create_plot(
                 edgecolors=d_border,
                 zorder=2
             )
-        # if distance_means is not None and distance_stds is not None:
-        #     axes[0].errorbar(
-        #         df_distance.index,
-        #         distance_means,
-        #         yerr=distance_stds,
-        #         linewidth=d_means_size,
-        #         color=d_line_color,
-        #         elinewidth=d_err_size,
-        #         ecolor=d_error_color,
-        #     )
-        # elif distance_means is not None:
-        #     axes[0].plot(
-        #         df_distance.index,
-        #         distance_means,
-        #         linewidth=d_means_size,
-        #         color=d_line_color,
-        #     )
         axes[0].set_ylabel(d_ylabel, 
                  size=d_ylabel_size, 
                  )
