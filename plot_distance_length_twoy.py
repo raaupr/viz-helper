@@ -160,13 +160,33 @@ def create_plot(
         # axes[-1].spines['right'].set_position(('axes', 1.2))
         # To make the border of the right-most axis visible, we need to turn the frame
         # on. This hides the other plots, however, so we need to turn its fill off.
-        # axes[-1].set_frame_on(True)
-        # axes[-1].patch.set_visible(False)
+        axes[-1].set_frame_on(True)
+        axes[-1].patch.set_visible(False)
     else:
         axes = [ax]
 
     # distance
     if df_distance is not None:
+        # means & std
+        if distance_means is not None:
+            axes[0].plot(
+                df_distance.index,
+                distance_means,
+                linewidth=d_means_size,
+                color=d_line_color,
+                zorder=3
+            )
+            if distance_stds is not None:
+                axes[0].fill_between(
+                    df_distance.index,
+                    -distance_means - distance_stds,
+                    -distance_means + distance_stds,
+                    color='none',
+                    alpha=0.2,
+                    facecolor=d_error_color,
+                    zorder=1
+                )
+        # scatter
         y = df_distance.index
         for i in range(len(df_distance.columns)):
             x = df_distance[df_distance.columns[i]]
@@ -181,25 +201,25 @@ def create_plot(
                 vmin=distance_min,
                 vmax=distance_max,
                 edgecolors=d_border,
+                zorder=2
             )
-        # means & std
-        if distance_means is not None and distance_stds is not None:
-            axes[0].errorbar(
-                df_distance.index,
-                distance_means,
-                yerr=distance_stds,
-                linewidth=d_means_size,
-                color=d_line_color,
-                elinewidth=d_err_size,
-                ecolor=d_error_color,
-            )
-        elif distance_means is not None:
-            axes[0].plot(
-                df_distance.index,
-                distance_means,
-                linewidth=d_means_size,
-                color=d_line_color,
-            )
+        # if distance_means is not None and distance_stds is not None:
+        #     axes[0].errorbar(
+        #         df_distance.index,
+        #         distance_means,
+        #         yerr=distance_stds,
+        #         linewidth=d_means_size,
+        #         color=d_line_color,
+        #         elinewidth=d_err_size,
+        #         ecolor=d_error_color,
+        #     )
+        # elif distance_means is not None:
+        #     axes[0].plot(
+        #         df_distance.index,
+        #         distance_means,
+        #         linewidth=d_means_size,
+        #         color=d_line_color,
+        #     )
         axes[0].set_ylabel(d_ylabel, 
                  size=d_ylabel_size, 
                  )
@@ -211,22 +231,23 @@ def create_plot(
     # length
     if df_length is not None:
         cur_ax = axes[0] if df_distance is None else axes[1]
-        if half_length:
-            cur_ax.plot(
+        # if half_length:
+        cur_ax.plot(
+            df_length.index,
+            length_means,
+            color=l_line_color,
+            linewidth=l_means_size,
+        )
+        if length_stds is not None:
+            cur_ax.fill_between(
                 df_length.index,
-                length_means,
-                color=l_line_color,
-                linewidth=l_means_size,
+                length_means - length_stds,
+                length_means + length_stds,
+                color='none',
+                alpha=0.2,
+                facecolor=l_error_color
             )
-            if length_stds is not None:
-                cur_ax.fill_between(
-                    df_length.index,
-                    length_means - length_stds,
-                    length_means + length_stds,
-                    color='none',
-                    alpha=0.2,
-                    facecolor=l_error_color
-                )
+        if half_length:
             cur_ax.plot(
                 df_length.index,
                 -length_means,
@@ -242,24 +263,24 @@ def create_plot(
                     alpha=0.2,
                     facecolor=l_error_color
                 )
-        else:
-            if length_stds is None:
-                cur_ax.plot(
-                    df_length.index,
-                    length_means,
-                    color=l_line_color,
-                    linewidth=l_means_size,
-                )
-            else:
-                cur_ax.errorbar(
-                    df_length.index,
-                    length_means,
-                    yerr=length_stds,
-                    linewidth=l_means_size,
-                    color=l_line_color,
-                    elinewidth=l_err_size,
-                    ecolor=l_error_color,
-                )
+        # else:
+        #     if length_stds is None:
+        #         cur_ax.plot(
+        #             df_length.index,
+        #             length_means,
+        #             color=l_line_color,
+        #             linewidth=l_means_size,
+        #         )
+        #     else:
+        #         cur_ax.errorbar(
+        #             df_length.index,
+        #             length_means,
+        #             yerr=length_stds,
+        #             linewidth=l_means_size,
+        #             color=l_line_color,
+        #             elinewidth=l_err_size,
+        #             ecolor=l_error_color,
+        #         )
         cur_ax.set_ylabel(l_ylabel, 
                  size=l_ylabel_size, 
                  )
@@ -270,10 +291,9 @@ def create_plot(
 
     plt.title(title, size=title_size)
     
-    
-    plt.xlabel(xlabel, size=xlabel_size)
-    plt.xticks(np.arange(xlim[0], xlim[1]+xticks_interval, xticks_interval), 
-                fontsize=xticks_size)
+    ax.set_xlabel(xlabel, size=xlabel_size)
+    ax.set_xticks(np.arange(xlim[0], xlim[1]+xticks_interval, xticks_interval))
+    ax.tick_params(axis='x', labelsize=xticks_size)
     
 
     if df_distance is not None and show_colorbar:

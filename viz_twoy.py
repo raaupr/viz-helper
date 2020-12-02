@@ -13,7 +13,7 @@ from plot_distance_length import(
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1.1
+VERSION = 1.2
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
@@ -206,8 +206,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
 
         st.sidebar.subheader("Distance colormap")
         cmap_plot = st.sidebar.empty()
-        config["DISTANCE"]["colormap_min"] = st.sidebar.number_input("Min value:", value=config["DISTANCE"]["colormap_min"])
-        config["DISTANCE"]["colormap_max"] = st.sidebar.number_input("Max value:", value=config["DISTANCE"]["colormap_max"], min_value = config["DISTANCE"]["colormap_min"] + 0.1)
+        config["DISTANCE"]["colormap_min"] = st.sidebar.number_input("Min value:", value=config["DISTANCE"]["colormap_min"], key="distance_cmap_min")
+        config["DISTANCE"]["colormap_max"] = st.sidebar.number_input("Max value:", value=config["DISTANCE"]["colormap_max"], min_value = config["DISTANCE"]["colormap_min"] + 0.1, key="distance_cmap_max")
 
         st.sidebar.write("Distance scatter plot colormap:")
         nb_colormap = st.sidebar.number_input("Number of colors:", value=len(config["DISTANCE"]["colormap_hex"]))
