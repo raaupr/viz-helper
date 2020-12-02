@@ -165,8 +165,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         config["LENGTH"]["means_size"] = st.sidebar.number_input("Length means line width:", value=config["LENGTH"]["means_size"], min_value=0.0)
         if config["LENGTH"]["means_error_type"] != "None":
             config["LENGTH"]["error_size"] = st.sidebar.number_input("Length error line width:", value=config["LENGTH"]["error_size"], min_value=0.0)
-    if df_distance is not None and config["DISTANCE"]["show_colorbar"]:
-        config["DISTANCE"]["colorbar_ticks_size"] = st.sidebar.number_input("Colorbar ticks size:", value=config["DISTANCE"]["colorbar_ticks_size"], min_value=0.0)
+    if df_distance is not None:
+        st_colorbar_ticks_size = st.sidebar.empty()
 
     st.sidebar.header("Elements:")
     if df_distance is not None:
@@ -176,6 +176,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
         )
     if df_distance is not None:
         config["DISTANCE"]["show_colorbar"] = st.sidebar.checkbox("Show color bar", value=config["DISTANCE"]["show_colorbar"])
+        if config["DISTANCE"]["show_colorbar"]:
+            config["DISTANCE"]["colorbar_ticks_size"] = st_colorbar_ticks_size.number_input("Colorbar ticks size:", value=config["DISTANCE"]["colorbar_ticks_size"], min_value=0.0)
     config["PLOT"]["show_grid"] = st.sidebar.checkbox("Show grid", value = config["PLOT"]["show_grid"])
 
     st.sidebar.header("Colors:")
