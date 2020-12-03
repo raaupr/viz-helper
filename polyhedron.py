@@ -125,6 +125,8 @@ def orient_faces(triangles):
     return res
 
 def compute_volume(pts, triangles):
+    """https://math.stackexchange.com/questions/803076/how-to-calculate-volume-of-non-convex-polyhedron"""
+    triangles = orient_faces(triangles)
     volume = 0
     for tri in triangles:
         face = pts[tri].transpose()
