@@ -17,7 +17,15 @@ Run this command in the terminal in the unzipped/cloned folder.
 ```bash
 streamlit run viz.py
 ```
-
+```bash
+streamlit run viz_twoy.py
+```
+```bash
+streamlit run viz_polyhedron.py
+```
+```bash
+streamlit run viz_polyhedra.py
+```
 ## Run the script
 Run these commands in the terminal in the unzipped/cloned folder.
 
