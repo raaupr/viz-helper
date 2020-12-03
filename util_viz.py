@@ -2,6 +2,9 @@ import yaml
 
 
 LINE_STYLES = ["solid", "dotted", "dashed", "dashdot"]
+LEGEND_LOCATIONS = [
+    'best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', 'center right', 'lower center', 'upper center', 'center'
+]
 
 def write_marker_info(container):
     container.markdown(
