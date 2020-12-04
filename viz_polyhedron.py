@@ -61,6 +61,7 @@ def upload_data(container):
             if name != "None":
                 cols += [int(name.split(":")[0])]
             df = df.iloc[:, cols]
+            df = df.dropna()
             data_complete = True
         else:
             container.warning(
