@@ -12,7 +12,7 @@ from polyhedron import (alpha_shape_3d_autoalpha, compute_volume, orient_faces,
                         plot_alphashape)
 from util_viz import LINE_STYLES, select_config
 
-VERSION = "0.0.0"
+VERSION = "0.0.1"
 
 cur_ver = version.parse(VERSION)
 
