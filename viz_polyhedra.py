@@ -11,7 +11,7 @@ from packaging import version
 from polyhedron import alpha_shape_3d_autoalpha, compute_volume
 from util_viz import LINE_STYLES, select_config, LEGEND_LOCATIONS
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 COLOR_ROW = "#FAEDCB"
 COLOR_FRAME = "#F7D9C4"
@@ -92,7 +92,7 @@ def edit_data(container, fin_list):
                 df = pd.read_excel(fin, sheet, header=row_start)
                 col_options = [f"{i}: {col}" for (i, col) in enumerate(df.columns)]
                 float_col_options = [
-                    x for (i, x) in enumerate(col_options) if df.dtypes[i] == "float64"
+                    x for (i, x) in enumerate(col_options) if (df.dtypes[i] == "float64" or df.dtypes[i] == "int64")
                 ]
                 if float_col_options:
                     x_col = st.selectbox("Column x:", float_col_options, key=f"xcol{i}")
