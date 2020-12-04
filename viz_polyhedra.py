@@ -11,7 +11,7 @@ from packaging import version
 from polyhedron import alpha_shape_3d_autoalpha, compute_volume
 from util_viz import LINE_STYLES, select_config, LEGEND_LOCATIONS
 
-VERSION = "0.0.0"
+VERSION = "0.0.1"
 
 COLOR_ROW = "#FAEDCB"
 COLOR_FRAME = "#F7D9C4"
@@ -114,7 +114,7 @@ def edit_data(container, fin_list):
                         subset=pd.IndexSlice[row_start:, [df_ori.columns[z_idx]]],
                     )
                     frame_col = st.selectbox(
-                        "Column frame:", col_options, key=f"frame{i}"
+                        "Column frame:", float_col_options, key=f"frame{i}"
                     )
                     frame_idx = int(frame_col.split(":")[0])
                     df_ori.applymap(
@@ -130,6 +130,7 @@ def edit_data(container, fin_list):
                     ]
                     cols = [len(df.columns) - 1, frame_idx, x_idx, y_idx, z_idx]
                     df = df.iloc[:, cols]
+                    df = df.dropna()
                     # -- style
                     col_names = [
                         "time alignment",
@@ -243,7 +244,8 @@ with st.spinner("Computing volumes..."):
                 _, _, triangles = alpha_shape_3d_autoalpha(pos)
                 volume = compute_volume(pos, triangles)
                 volumes.append(volume)
-        except Exception:
+        except Exception as e:
+            print(e)
             st.error("Unable to create polyhedra from data, please check your data")
             st.stop()
         df_vol = pd.DataFrame({"time": times.unique(), data_name: volumes})
