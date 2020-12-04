@@ -4,8 +4,9 @@ from collections import defaultdict
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from queue import Queue
+import streamlit as st
 
-
+@st.cache
 def alpha_shape_3d_autoalpha(pos):
     """
     Based on: https://stackoverflow.com/questions/26303878/alpha-shapes-in-3d
@@ -62,7 +63,7 @@ def alpha_shape_3d_autoalpha(pos):
 
     return Vertices, Edges, Triangles
 
-
+@st.cache
 def plot_alphashape(pts, triangles, text=None):
     if text is None:
         text = [str(i) for i in range(len(pts))]
@@ -87,6 +88,7 @@ def plot_alphashape(pts, triangles, text=None):
     )
     return fig
 
+@st.cache
 def switch(cur_tri, tri, same_elmts):
     idx0_i = np.where(cur_tri == same_elmts[0])[0][0]
     idx1_i = np.where(cur_tri == same_elmts[1])[0][0]
@@ -99,6 +101,7 @@ def switch(cur_tri, tri, same_elmts):
     new_triangle[idx_other_i] = other_j
     return new_triangle    
 
+@st.cache
 def orient_faces(triangles):
     # -- prepare queues     
     next_tri = Queue()
@@ -124,6 +127,7 @@ def orient_faces(triangles):
         remaining_tri = new_remain
     return res
 
+@st.cache
 def compute_volume(pts, triangles):
     """https://math.stackexchange.com/questions/803076/how-to-calculate-volume-of-non-convex-polyhedron"""
     triangles = orient_faces(triangles)
