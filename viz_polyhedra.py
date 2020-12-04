@@ -11,7 +11,7 @@ from packaging import version
 from polyhedron import alpha_shape_3d_autoalpha, compute_volume
 from util_viz import LINE_STYLES, select_config, LEGEND_LOCATIONS
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 COLOR_ROW = "#FAEDCB"
 COLOR_FRAME = "#F7D9C4"
@@ -252,13 +252,18 @@ with st.spinner("Computing volumes..."):
         df_vol = df_vol.set_index("time")
         df_volumes.append(df_vol)
         df_volumes_concat = pd.concat(df_volumes, axis=1, join="outer")
+        df_volumes_concat.sort_index(inplace=True)
+        df_volumes_concat["Time"] = df_volumes_concat.index
+        cols = list(df_volumes_concat.columns)
+        cols = [cols[-1]] + cols[:-1]
+        df_volumes_concat = df_volumes_concat[cols]
 
 with st.beta_expander("Volume data"):              
     st.write(df_volumes_concat)
     vol_outfile = st.text_input("Save volumes as:", value=os.path.join(os.path.abspath(os.getcwd()), "volumes.csv"))
     if st.button("Save volumes"):
         with st.spinner("Saving volumes..."):
-            df_vol.to_csv(vol_outfile)
+            df_volumes_concat.to_csv(vol_outfile)
         st.info(f"Volumes saved to {vol_outfile}")     
 
 with st.sidebar.beta_expander("Edit volume plot", expanded=False):
@@ -435,11 +440,11 @@ with st.sidebar.beta_expander("Edit volume plot", expanded=False):
 with st.beta_expander("Volume plot"):
     fig, ax = plt.subplots(figsize=(config["fig_width"], config["fig_height"]))
     # -- line
-    for i in range(len(df_volumes_concat.columns)):
+    for i in range(len(data_names)):
         ax.plot(
             df_volumes_concat.index,
-            df_volumes_concat.iloc[:,i],
-            label=df_volumes_concat.columns[i],
+            df_volumes_concat[data_names[i]],
+            label=data_names[i],
             marker=config["markers"][i],
             linestyle=config["line_styles"][i],
             linewidth=config["line_widths"][i],
