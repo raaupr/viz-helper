@@ -8,11 +8,11 @@ import xlrd
 import yaml
 from packaging import version
 
-from polyhedron import (alpha_shape_3d_autoalpha, compute_volume, orient_faces,
+from polyhedron import (alpha_shape_3d_autoalpha, compute_volume_tetras, orient_faces,
                         plot_alphashape)
 from util_viz import LINE_STYLES, select_config
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 cur_ver = version.parse(VERSION)
 
@@ -113,9 +113,9 @@ if data_complete:
                         np.array(z[times == time]),
                     ]
                 ).transpose()
-                _, _, triangles = alpha_shape_3d_autoalpha(pos)
+                _, _, triangles, tetras = alpha_shape_3d_autoalpha(pos)
                 triangles = orient_faces(triangles)
-                volume = compute_volume(pos, triangles)
+                volume = compute_volume_tetras(pos, triangles, tetras)
                 volumes.append(volume)
                 polyhedra[time] = {"pos": pos, "triangles": triangles, "volume": volume}
         except Exception:

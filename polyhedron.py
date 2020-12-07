@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 from queue import Queue
 import streamlit as st
 
+
 @st.cache
 def alpha_shape_3d_autoalpha(pos):
     """
@@ -61,7 +62,8 @@ def alpha_shape_3d_autoalpha(pos):
         if len(Vertices) == len(pos):
             break
 
-    return Vertices, Edges, Triangles
+    return Vertices, Edges, Triangles, tetras
+
 
 @st.cache
 def plot_alphashape(pts, triangles, text=None):
@@ -88,22 +90,26 @@ def plot_alphashape(pts, triangles, text=None):
     )
     return fig
 
+
 @st.cache
 def switch(cur_tri, tri, same_elmts):
     idx0_i = np.where(cur_tri == same_elmts[0])[0][0]
     idx1_i = np.where(cur_tri == same_elmts[1])[0][0]
-    idx_other_i = np.where((cur_tri != same_elmts[0]) & (cur_tri != same_elmts[1]))[0][0]
+    idx_other_i = np.where((cur_tri != same_elmts[0]) & (cur_tri != same_elmts[1]))[0][
+        0
+    ]
     idx_other_j = np.where((tri != same_elmts[0]) & (tri != same_elmts[1]))[0][0]
     other_j = tri[idx_other_j]
-    new_triangle = [-1,-1,-1]
+    new_triangle = [-1, -1, -1]
     new_triangle[idx0_i] = same_elmts[1]
     new_triangle[idx1_i] = same_elmts[0]
     new_triangle[idx_other_i] = other_j
-    return new_triangle    
+    return new_triangle
+
 
 @st.cache
 def orient_faces(triangles):
-    # -- prepare queues     
+    # -- prepare queues
     next_tri = Queue()
     remaining_tri = Queue()
     for tri in triangles:
@@ -118,7 +124,7 @@ def orient_faces(triangles):
         res.append(cur_tri)
         while not remaining_tri.empty():
             tri = remaining_tri.get()
-            same_elmts = list(set(cur_tri)&set(tri))
+            same_elmts = list(set(cur_tri) & set(tri))
             if len(same_elmts) < 2:
                 new_remain.put(tri)
             else:
@@ -127,6 +133,7 @@ def orient_faces(triangles):
         remaining_tri = new_remain
     return res
 
+
 @st.cache
 def compute_volume(pts, triangles):
     """https://math.stackexchange.com/questions/803076/how-to-calculate-volume-of-non-convex-polyhedron"""
@@ -134,6 +141,35 @@ def compute_volume(pts, triangles):
     volume = 0
     for tri in triangles:
         face = pts[tri].transpose()
-        volume += np.linalg.det(face)/6
-    volume = abs(volume)    
+        volume += np.linalg.det(face) / 6
+    volume = abs(volume)
     return volume
+
+
+def compute_volume_tetras(pts, triangles, tetras):
+    volume = 0
+    for plane in triangles:
+        plane_coords = pts[plane]
+        for tetra in tetras:
+            same_elmts = list(set(plane) & set(tetra))
+            if len(same_elmts) == 3:
+                break
+        idx_other = np.where(
+            (tetra != same_elmts[0])
+            & (tetra != same_elmts[1])
+            & (tetra != same_elmts[2])
+        )[0][0]
+        idx_other = tetra[idx_other]
+        A, B, C = plane_coords
+        X = pts[idx_other]
+        Bp = B - A
+        Cp = C - A
+        Xp = X - A
+        plane_sign = np.linalg.det(np.array([Bp, Cp, Xp]))
+        plane_vol = np.linalg.det(plane_coords) / 6
+        if plane_sign > 0:
+            sign = 1
+        else:
+            sign = -1
+        volume += sign * plane_vol
+    return abs(volume)

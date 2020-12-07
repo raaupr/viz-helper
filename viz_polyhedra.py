@@ -8,10 +8,10 @@ import xlrd
 import yaml
 from packaging import version
 
-from polyhedron import alpha_shape_3d_autoalpha, compute_volume
+from polyhedron import alpha_shape_3d_autoalpha, compute_volume_tetras
 from util_viz import LINE_STYLES, select_config, LEGEND_LOCATIONS
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 COLOR_ROW = "#FAEDCB"
 COLOR_FRAME = "#F7D9C4"
@@ -241,8 +241,8 @@ with st.spinner("Computing volumes..."):
                         np.array(z[times == time]),
                     ]
                 ).transpose()
-                _, _, triangles = alpha_shape_3d_autoalpha(pos)
-                volume = compute_volume(pos, triangles)
+                _, _, triangles, tetras = alpha_shape_3d_autoalpha(pos)
+                volume = compute_volume_tetras(pos, triangles, tetras)
                 volumes.append(volume)
         except Exception as e:
             print(e)
