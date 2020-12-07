@@ -297,6 +297,7 @@ def create_plot(
                 vmin=distance_min,
                 vmax=distance_max,
                 edgecolors=d_border,
+                zorder=4
             )
         # means & std
         if distance_means is not None:
@@ -305,7 +306,7 @@ def create_plot(
                 distance_means,
                 color=d_line_color,
                 linewidth=d_means_size,
-                zorder=3
+                zorder=5
             )
             if distance_stds is not None:
                 plt.fill_between(
@@ -314,6 +315,7 @@ def create_plot(
                     distance_means + distance_stds,
                     color=d_error_color,
                     alpha=0.2,
+                    zorder=3
                 )
 
     # length
@@ -323,6 +325,7 @@ def create_plot(
             length_means,
             color=l_line_color,
             linewidth=l_means_size,
+            zorder=2
         )
         if length_stds is not None:
             plt.fill_between(
@@ -331,6 +334,7 @@ def create_plot(
                 length_means + length_stds,
                 color=l_error_color,
                 alpha=0.2,
+                zorder=1
             )
         if half_length:
             plt.plot(
@@ -338,6 +342,7 @@ def create_plot(
                 -length_means,
                 color=l_line_color,
                 linewidth=l_means_size,
+                zorder=2
             )
             if length_stds is not None:
                 plt.fill_between(
@@ -346,6 +351,7 @@ def create_plot(
                     -length_means + length_stds,
                     color=l_error_color,
                     alpha=0.2,
+                    zorder=1
                 )
 
     plt.title(title, size=title_size)

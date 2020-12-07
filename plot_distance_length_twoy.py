@@ -15,7 +15,14 @@ from matplotlib import pyplot
 from matplotlib.colors import LinearSegmentedColormap
 
 from util_colormap import get_continuous_cmap
-from plot_distance_length import read_file, get_means_error, DEFAULT_HEX_LIST, DEFAULT_PROPORTION_LIST, half, get_distance_cmap
+from plot_distance_length import (
+    read_file,
+    get_means_error,
+    DEFAULT_HEX_LIST,
+    DEFAULT_PROPORTION_LIST,
+    half,
+    get_distance_cmap,
+)
 
 
 def create_plot(
@@ -165,32 +172,82 @@ def create_plot(
     else:
         axes = [ax]
 
+    # length
+    if df_length is not None:
+        cur_ax = axes[0]
+        # if half_length:
+        cur_ax.plot(
+            df_length.index,
+            length_means,
+            color=l_line_color,
+            linewidth=l_means_size,
+            zorder=2,
+        )
+        if length_stds is not None:
+            cur_ax.fill_between(
+                df_length.index,
+                length_means - length_stds,
+                length_means + length_stds,
+                color="none",
+                alpha=0.2,
+                facecolor=l_error_color,
+                zorder=1,
+            )
+        if half_length:
+            cur_ax.plot(
+                df_length.index,
+                -length_means,
+                color=l_line_color,
+                linewidth=l_means_size,
+                zorder=2,
+            )
+            if length_stds is not None:
+                cur_ax.fill_between(
+                    df_length.index,
+                    -length_means - length_stds,
+                    -length_means + length_stds,
+                    color="none",
+                    alpha=0.2,
+                    facecolor=l_error_color,
+                    zorder=1,
+                )
+        cur_ax.set_ylabel(
+            l_ylabel,
+            size=l_ylabel_size,
+        )
+        cur_ax.set_ylim(l_ylim)
+        cur_ax.set_yticks(
+            np.arange(l_ylim[0], l_ylim[1] + l_yticks_interval, l_yticks_interval)
+        )
+        cur_ax.tick_params(axis="y", labelsize=l_yticks_size)
+
     # distance
     if df_distance is not None:
+        cur_ax = axes[-1]
         # means & std
         if distance_means is not None:
-            axes[0].plot(
+            cur_ax.plot(
                 df_distance.index,
                 distance_means,
                 linewidth=d_means_size,
                 color=d_line_color,
-                zorder=3
+                zorder=5,
             )
             if distance_stds is not None:
-                axes[0].fill_between(
+                cur_ax.fill_between(
                     df_distance.index,
                     distance_means - distance_stds,
                     distance_means + distance_stds,
-                    color='none',
+                    color="none",
                     alpha=0.2,
                     facecolor=d_error_color,
-                    zorder=1
+                    zorder=3,
                 )
         # scatter
         y = df_distance.index
         for i in range(len(df_distance.columns)):
             x = df_distance[df_distance.columns[i]]
-            sc = axes[0].scatter(
+            sc = cur_ax.scatter(
                 y,
                 x,
                 c=x,
@@ -201,87 +258,27 @@ def create_plot(
                 vmin=distance_min,
                 vmax=distance_max,
                 edgecolors=d_border,
-                zorder=2
+                zorder=4,
             )
-        axes[0].set_ylabel(d_ylabel, 
-                 size=d_ylabel_size, 
-                 )
-        axes[0].set_ylim(d_ylim)
-        axes[0].set_yticks(np.arange(d_ylim[0], d_ylim[1]+d_yticks_interval, d_yticks_interval))
-        axes[0].tick_params(axis='y', 
-                    labelsize=d_yticks_size)
-
-    # length
-    if df_length is not None:
-        cur_ax = axes[0] if df_distance is None else axes[1]
-        # if half_length:
-        cur_ax.plot(
-            df_length.index,
-            length_means,
-            color=l_line_color,
-            linewidth=l_means_size,
+        cur_ax.set_ylabel(
+            d_ylabel,
+            size=d_ylabel_size,
         )
-        if length_stds is not None:
-            cur_ax.fill_between(
-                df_length.index,
-                length_means - length_stds,
-                length_means + length_stds,
-                color='none',
-                alpha=0.2,
-                facecolor=l_error_color
-            )
-        if half_length:
-            cur_ax.plot(
-                df_length.index,
-                -length_means,
-                color=l_line_color,
-                linewidth=l_means_size,
-            )
-            if length_stds is not None:
-                cur_ax.fill_between(
-                    df_length.index,
-                    -length_means - length_stds,
-                    -length_means + length_stds,
-                    color='none',
-                    alpha=0.2,
-                    facecolor=l_error_color
-                )
-        # else:
-        #     if length_stds is None:
-        #         cur_ax.plot(
-        #             df_length.index,
-        #             length_means,
-        #             color=l_line_color,
-        #             linewidth=l_means_size,
-        #         )
-        #     else:
-        #         cur_ax.errorbar(
-        #             df_length.index,
-        #             length_means,
-        #             yerr=length_stds,
-        #             linewidth=l_means_size,
-        #             color=l_line_color,
-        #             elinewidth=l_err_size,
-        #             ecolor=l_error_color,
-        #         )
-        cur_ax.set_ylabel(l_ylabel, 
-                 size=l_ylabel_size, 
-                 )
-        cur_ax.set_ylim(l_ylim)
-        cur_ax.set_yticks(np.arange(l_ylim[0], l_ylim[1]+l_yticks_interval, l_yticks_interval))
-        cur_ax.tick_params(axis='y', 
-                    labelsize=l_yticks_size)
+        cur_ax.set_ylim(d_ylim)
+        cur_ax.set_yticks(
+            np.arange(d_ylim[0], d_ylim[1] + d_yticks_interval, d_yticks_interval)
+        )
+        cur_ax.tick_params(axis="y", labelsize=d_yticks_size)
 
     plt.title(title, size=title_size)
-    
+
     ax.set_xlabel(xlabel, size=xlabel_size)
-    ax.set_xticks(np.arange(xlim[0], xlim[1]+xticks_interval, xticks_interval))
-    ax.tick_params(axis='x', labelsize=xticks_size)
-    
+    ax.set_xticks(np.arange(xlim[0], xlim[1] + xticks_interval, xticks_interval))
+    ax.tick_params(axis="x", labelsize=xticks_size)
 
     if df_distance is not None and show_colorbar:
         cbar = plt.colorbar(sc, orientation="horizontal")
-        cbar.ax.tick_params(labelsize=cbar_ticks_size) 
+        cbar.ax.tick_params(labelsize=cbar_ticks_size)
     if show_grid:
         plt.grid()
 
@@ -438,9 +435,9 @@ def main(
         (ylim_min, ylim_max),
         title,
         xlabel,
-        d_ylabel = ylabel,
-        l_ylabel = ylabel,
-        title_size = 10,
+        d_ylabel=ylabel,
+        l_ylabel=ylabel,
+        title_size=10,
         xlabel_size=10,
         d_ylabel_size=10,
         l_ylabel_size=10,
@@ -450,7 +447,7 @@ def main(
         xticks_interval=100,
         d_yticks_interval=1,
         l_yticks_interval=1,
-        marker="o"
+        marker="o",
     )
 
     plt.savefig(outfile)
