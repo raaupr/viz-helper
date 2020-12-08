@@ -12,8 +12,8 @@ Data visualization scripts for various projects.
     pip install -r requirements.txt
     ```
 
-## Run GUI    
-Run this command in the terminal in the unzipped/cloned folder.
+## Run    
+Run one of these commands in the terminal in the unzipped/cloned folder.
 ```bash
 streamlit run viz.py
 ```
@@ -26,21 +26,6 @@ streamlit run viz_polyhedron.py
 ```bash
 streamlit run viz_polyhedra.py
 ```
-## Run the script
-Run these commands in the terminal in the unzipped/cloned folder.
-
-### Chromosome Distance & Spindle Length vs Time: `plot_distance_length.py`
 ```bash
-python plot_distance_length.py "path_to_distance_file" "path_to_length_file"
+python maxmin.py INPUT_PATH OUTPUT_PATH
 ```
-Replace `path_to_distance_file` and `path_to_length_file` with the full/relative path of your data files.
-
-To know more options you can use to customize the plot, run:
-```bash
-python plot_distance_length.py --help
-```
-Example command with customization options:
-```bash
-python plot_distance_length.py "~/Documents/distance.xlsx" "~/Documents/length.xlsx" -outfile="~/Documents/plot200.jpg" -distance_min=-200 
-```
-This command will use data from `"~/Documents/distance.xlsx"` and `"~/Documents/length.xlsx"` and create the plot from distance `-200` to `0` and save the resulting plot to `"~/Documents/plot200.jpg"`.
