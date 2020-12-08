@@ -79,13 +79,7 @@ def edit_data(container, fin_list):
                     "Select data sheet:", xls.sheet_names, key=f"sheet{i}"
                 )
                 df_ori = pd.read_excel(fin, sheet)
-                row_start = st.number_input(
-                    "Start of data row:",
-                    min_value=0,
-                    max_value=len(df_ori) - 1,
-                    value=0,
-                    key=f"row_start{i}",
-                )
+                row_start = 1
                 df_ori = df_ori.style.applymap(
                     highlight_rows, subset=pd.IndexSlice[row_start:, :]
                 )
@@ -95,20 +89,17 @@ def edit_data(container, fin_list):
                     x for (i, x) in enumerate(col_options) if (df.dtypes[i] == "float64" or df.dtypes[i] == "int64")
                 ]
                 if float_col_options:
-                    x_col = st.selectbox("Column x:", float_col_options, key=f"xcol{i}")
-                    x_idx = int(x_col.split(":")[0])
+                    x_idx = 0
                     df_ori.applymap(
                         highlight_x,
                         subset=pd.IndexSlice[row_start:, [df_ori.columns[x_idx]]],
                     )
-                    y_col = st.selectbox("Column y:", float_col_options, key=f"ycol{i}")
-                    y_idx = int(y_col.split(":")[0])
+                    y_idx = 1
                     df_ori.applymap(
                         highlight_y,
                         subset=pd.IndexSlice[row_start:, [df_ori.columns[y_idx]]],
                     )
-                    z_col = st.selectbox("Column z:", float_col_options, key=f"zcol{i}")
-                    z_idx = int(z_col.split(":")[0])
+                    z_idx = 2
                     df_ori.applymap(
                         highlight_z,
                         subset=pd.IndexSlice[row_start:, [df_ori.columns[z_idx]]],
