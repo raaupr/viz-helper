@@ -55,7 +55,7 @@ def process_file(file_path, output_path, debug):
         # -- process
         time = df.iloc[:, 0]
         res = {}
-        for i in range(1, len(df), 6):
+        for i in range(1, len(df.columns)-1, 6):
             df_slice = df.iloc[:, i : i + 6]
             df_slice[time.name] = time
             df_slice = df_slice.set_index(time.name)
@@ -81,6 +81,7 @@ def process_file(file_path, output_path, debug):
         worksheet.write(1, 0, df.columns[0])
         # data
         for t in time:
+            time = time.replace(np.nan, "", regex=True)
             worksheet.write_column(2, 0, time)
         # -- each film group
         for i, name in enumerate(res.keys()):
