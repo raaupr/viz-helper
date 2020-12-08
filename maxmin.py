@@ -110,9 +110,12 @@ def main(input_path, output_path, debug=False):
             logger.info(f'"{output_path}" do not exist, creating...')
             os.makedirs(output_path)
     if os.path.isfile(input_path):
+        logger.info(f"{input_path} is a file")
         process_file(input_path, output_path, debug)
     elif os.path.isdir(input_path):
-        for input_file in glob.glob(os.path.join(output_path, "*.xlsx")):
+        excel_files = glob.glob(os.path.join(input_path, "*.xlsx"))
+        logger.info(f"{input_path} is a directory: {len(excel_files)} xlsx files found")
+        for input_file in excel_files:
             process_file(input_file, output_path, debug)
 
 
