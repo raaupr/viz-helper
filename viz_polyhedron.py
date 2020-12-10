@@ -8,8 +8,12 @@ import xlrd
 import yaml
 from packaging import version
 
-from polyhedron import (alpha_shape_3d_autoalpha, compute_volume_tetras, orient_faces,
-                        plot_alphashape)
+from polyhedron import (
+    alpha_shape_3d_autoalpha,
+    compute_volume_tetras,
+    orient_faces,
+    plot_alphashape,
+)
 from util_viz import LINE_STYLES, select_config
 
 VERSION = "0.0.3"
@@ -40,14 +44,18 @@ def upload_data(container):
         df = pd.read_excel(fin, sheet, header=row_start)
         col_options = [f"{i}: {col}" for (i, col) in enumerate(df.columns)]
         float_col_options = [
-            x for (i, x) in enumerate(col_options) if (df.dtypes[i] == "float64" or df.dtypes[i] == "int64")
+            x
+            for (i, x) in enumerate(col_options)
+            if (df.dtypes[i] == "float64" or df.dtypes[i] == "int64")
         ]
         if float_col_options:
             col1, col2 = container.beta_columns(2)
             timestamp = col1.selectbox("Column timestamp:", float_col_options)
             name = col2.selectbox("Column names (opt):", ["None"] + col_options)
             cols = [
-                0, 1, 2,
+                0,
+                1,
+                2,
                 int(timestamp.split(":")[0]),
             ]
             if name != "None":
@@ -121,10 +129,33 @@ if data_complete:
         col1.write(f"Volume: {polyhedra[time]['volume']}")
         with st.spinner("Creating plot..."):
             # -- plot alpha shape
-            fig = plot_alphashape(
-                polyhedra[time]["pos"], polyhedra[time]["triangles"], names
+            fig, (minx, miny, minz, maxx, maxy, maxz) = plot_alphashape(
+                polyhedra[time]["pos"],
+                polyhedra[time]["triangles"],
+                names,
+                compute_range=True,
             )
-
+            st.write("Range: ")
+            colx, coly, colz = st.beta_columns(3)
+            x_range = colx.number_input("x-axis", value=maxx - minx)
+            y_range = coly.number_input("y-axis", value=maxy - miny)
+            z_range = colz.number_input("z-axis", value=maxz - minz)
+            x_diff = (x_range - (maxx - minx)) / 2
+            minx -= x_diff
+            maxx += x_diff
+            y_diff = (y_range - (maxy - miny)) / 2
+            miny -= y_diff
+            maxy += y_diff
+            z_diff = (z_range - (maxz - minz)) / 2
+            minz -= z_diff
+            maxz += z_diff
+            fig.update_layout(
+                scene=dict(
+                    xaxis=dict(range=[minx, maxx]),
+                    yaxis=dict(range=[miny, maxy]),
+                    zaxis=dict(range=[minz, maxz])
+                )
+            )
             col2.write(fig)
 
     with st.sidebar.beta_expander("Edit volume plot", expanded=False):
@@ -244,7 +275,8 @@ if data_complete:
         config["show_grid"] = st.checkbox("Show grid", value=config["show_grid"])
         st.subheader("Save configurations")
         save_config_file = st.text_input(
-            "Save configurations as:", value=os.path.join(os.path.abspath(os.getcwd()), "config.yml")
+            "Save configurations as:",
+            value=os.path.join(os.path.abspath(os.getcwd()), "config.yml"),
         )
         if st.button("Save", key="save_config"):
             with open(save_config_file, "w") as fout:
@@ -256,7 +288,7 @@ if data_complete:
         fig, ax = plt.subplots(figsize=(config["fig_width"], config["fig_height"]))
         # -- line
         ax.plot(
-            uniq_times, 
+            uniq_times,
             volumes,
             marker=config["marker"],
             linestyle=config["line_style"],
@@ -267,7 +299,10 @@ if data_complete:
             markeredgecolor=config["marker_edgecolor"],
         )
         # -- title
-        ax.set_title(config["title"], {"fontsize": config["title_size"],"color": config["title_color"]})
+        ax.set_title(
+            config["title"],
+            {"fontsize": config["title_size"], "color": config["title_color"]},
+        )
         # -- x-axis
         ax.set_xlabel(
             config["xlabel"], size=config["xlabel_size"], color=config["xlabel_color"]
@@ -302,28 +337,30 @@ if data_complete:
         if config["show_grid"]:
             plt.grid()
 
-        col1, col2 = st.beta_columns([1,3])            
+        col1, col2 = st.beta_columns([1, 3])
         # -- show volumes
-        df_vol = pd.DataFrame({
-                    "timestamp": uniq_times,
-                    "volume": volumes
-                })
-        col1.write(df_vol)                
+        df_vol = pd.DataFrame({"timestamp": uniq_times, "volume": volumes})
+        col1.write(df_vol)
         # -- save volumes
-        vol_outfile = col1.text_input("Save volumes as:", value=os.path.join(os.path.abspath(os.getcwd()), "volumes.csv"))
+        vol_outfile = col1.text_input(
+            "Save volumes as:",
+            value=os.path.join(os.path.abspath(os.getcwd()), "volumes.csv"),
+        )
         if col1.button("Save volumes"):
             with st.spinner("Saving volumes..."):
                 df_vol.to_csv(vol_outfile)
-            col1.info(f"Volumes saved to {vol_outfile}")     
+            col1.info(f"Volumes saved to {vol_outfile}")
         # -- show plot
         col2.pyplot(plt)
         # -- save plot
-        outfile = col2.text_input("Save plot as:", value=os.path.join(os.path.abspath(os.getcwd()), "plot.eps"))
+        outfile = col2.text_input(
+            "Save plot as:",
+            value=os.path.join(os.path.abspath(os.getcwd()), "plot.eps"),
+        )
         if col2.button("Save plot"):
-            if (outfile[-4:] 
-                in plt.gcf().canvas.get_supported_filetypes().keys()
-                or outfile[-3:]
-                in plt.gcf().canvas.get_supported_filetypes().keys()
+            if (
+                outfile[-4:] in plt.gcf().canvas.get_supported_filetypes().keys()
+                or outfile[-3:] in plt.gcf().canvas.get_supported_filetypes().keys()
             ):
                 with st.spinner("Saving plot..."):
                     plt.savefig(outfile)
@@ -332,4 +369,3 @@ if data_complete:
                 col2.error(
                     f"Filename should end with one of the following extensions: {list(plt.gcf().canvas.get_supported_filetypes().keys())}"
                 )
-        

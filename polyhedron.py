@@ -65,11 +65,13 @@ def alpha_shape_3d_autoalpha(pos):
     return Vertices, Edges, Triangles, tetras
 
 
-@st.cache
-def plot_alphashape(pts, triangles, text=None):
+@st.cache(allow_output_mutation=True)
+def plot_alphashape(pts, triangles, text=None, compute_range=False):
     if text is None:
         text = [str(i) for i in range(len(pts))]
     fig = make_subplots()
+    minx = miny = minz = 999999999
+    maxx = maxy = maxz = -999999999
     for s in triangles:
         s = np.append(s, s[0])
         vtx = np.array([pts[i] for i in s])
@@ -83,11 +85,20 @@ def plot_alphashape(pts, triangles, text=None):
             name="y",
         )
         fig.add_trace(trace)
+        if compute_range:
+            minx = min(minx, min(vtx[:, 0]))
+            miny = min(miny, min(vtx[:, 1]))
+            minz = min(minz, min(vtx[:, 2]))
+            maxx = max(maxx, max(vtx[:, 0]))
+            maxy = max(maxy, max(vtx[:, 1]))
+            maxz = max(maxz, max(vtx[:, 2]))
     fig.add_trace(
         go.Scatter3d(
             x=pts[:, 0], y=pts[:, 1], z=pts[:, 2], mode="markers+text", text=text
         )
     )
+    if compute_range:
+        return fig, (minx, miny, minz, maxx, maxy, maxz)
     return fig
 
 
