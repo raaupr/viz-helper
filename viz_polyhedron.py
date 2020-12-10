@@ -12,7 +12,7 @@ from polyhedron import (alpha_shape_3d_autoalpha, compute_volume_tetras, orient_
                         plot_alphashape)
 from util_viz import LINE_STYLES, select_config
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 cur_ver = version.parse(VERSION)
 
@@ -36,26 +36,18 @@ def upload_data(container):
         xls = pd.ExcelFile(xlrd.open_workbook(file_contents=fin.read(), on_demand=True))
         sheet = container.selectbox("Select data sheet:", xls.sheet_names)
         df = pd.read_excel(fin, sheet)
-        row_start = container.number_input(
-            "Start of data row:", min_value=0, max_value=len(df) - 1, value=0
-        )
+        row_start = 1
         df = pd.read_excel(fin, sheet, header=row_start)
         col_options = [f"{i}: {col}" for (i, col) in enumerate(df.columns)]
         float_col_options = [
-            x for (i, x) in enumerate(col_options) if df.dtypes[i] == "float64"
+            x for (i, x) in enumerate(col_options) if (df.dtypes[i] == "float64" or df.dtypes[i] == "int64")
         ]
         if float_col_options:
-            col1, col2, col3 = container.beta_columns(3)
-            x_col = col1.selectbox("Column x:", float_col_options)
-            y_col = col2.selectbox("Column y:", float_col_options)
-            z_col = col3.selectbox("Column z:", float_col_options)
             col1, col2 = container.beta_columns(2)
-            timestamp = col1.selectbox("Column timestamp:", col_options)
+            timestamp = col1.selectbox("Column timestamp:", float_col_options)
             name = col2.selectbox("Column names (opt):", ["None"] + col_options)
             cols = [
-                int(x_col.split(":")[0]),
-                int(y_col.split(":")[0]),
-                int(z_col.split(":")[0]),
+                0, 1, 2,
                 int(timestamp.split(":")[0]),
             ]
             if name != "None":
@@ -132,6 +124,7 @@ if data_complete:
             fig = plot_alphashape(
                 polyhedra[time]["pos"], polyhedra[time]["triangles"], names
             )
+
             col2.write(fig)
 
     with st.sidebar.beta_expander("Edit volume plot", expanded=False):
