@@ -1,0 +1,38 @@
+VERSION: 0.0.0
+
+fig_width: 20.0
+fig_height: 10.0 
+
+line_color: "#000000"
+line_width: 2.0
+line_style: solid
+
+marker: o
+marker_size: 0.0
+marker_facecolor: "#000000"
+marker_edgecolor: "#000000"
+
+title: Polyhedra Volumes
+title_size: 30.0
+title_color: "#000000"
+
+ylabel: Volume
+ylim_min: 0
+ylim_max: 100.0
+ylabel_size: 20.0
+ylabel_color: "#000000"
+yticks_size: 10.0
+yticks_interval: 10.0
+yticks_color: "#000000"
+
+xlabel: Timestamp
+xlim_min: 0
+xlim_max: 200
+xlabel_size: 20.0
+xlabel_color: "#000000"
+xticks_size: 10.0
+xticks_interval: 10.0
+xticks_color: "#000000"
+
+show_grid: True
+
