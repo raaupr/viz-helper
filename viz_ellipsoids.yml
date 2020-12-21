@@ -1,0 +1,49 @@
+VERSION: 0.0.0
+
+fig_width: 20.0
+fig_height: 10.0 
+
+line_colors: 
+  - "#000000"
+line_widths: 
+  - 2.0
+line_styles: 
+  - solid
+
+markers: 
+  - o
+marker_sizes: 
+  - 0.0
+marker_facecolors: 
+  - "#000000"
+marker_edgecolors: 
+  - "#000000"
+
+title: Ellipsoids Volumes
+title_size: 30.0
+title_color: "#000000"
+
+ylabel: Volume
+ylim_min: 0.0
+ylim_max: 20.0
+ylabel_size: 20.0
+ylabel_color: "#000000"
+yticks_size: 10.0
+yticks_interval: 10.0
+yticks_color: "#000000"
+
+xlabel: Timestamp
+xlim_min: -200
+xlim_max: 0
+xlabel_size: 20.0
+xlabel_color: "#000000"
+xticks_size: 10.0
+xticks_interval: 10.0
+xticks_color: "#000000"
+
+show_grid: True
+
+show_legend: True
+legend_loc: best
+legend_size: 10.0
+
