@@ -11,14 +11,14 @@ from packaging import version
 from ellipsoid import  plot_ellipsoid, get_ellipsoid_volume, get_min_vol_ellipse
 from util_viz import LINE_STYLES, select_config
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 cur_ver = version.parse(VERSION)
 
 st.set_option("deprecation.showfileUploaderEncoding", False)
 st.set_page_config(
-    page_title="Polyhedron",
-    page_icon=":shark:",
+    page_title="Ellipsoid Viewer",
+    page_icon=":pig_nose:",
     layout="centered",
     initial_sidebar_state="expanded",
 )
@@ -172,29 +172,26 @@ if data_complete:
                 config = yaml.load(fin_config, Loader=yaml.Loader)
         # -- options
         st.subheader("Figure")
-        col1, col2 = st.beta_columns(2)
-        config["fig_width"] = col1.number_input(
+        config["fig_width"] = st.number_input(
             "Width:", min_value=0.0, value=config["fig_width"]
         )
-        config["fig_height"] = col2.number_input(
+        config["fig_height"] = st.number_input(
             "Height:", min_value=0.0, value=config["fig_height"]
         )
         st.subheader("Line")
-        col1, col2 = st.beta_columns(2)
         line_style_idx = LINE_STYLES.index(config["line_style"])
-        config["line_style"] = col1.selectbox(
+        config["line_style"] = st.selectbox(
             "Line style:", LINE_STYLES, index=line_style_idx
         )
-        config["line_width"] = col2.number_input(
+        config["line_width"] = st.number_input(
             "Line width:", min_value=0.0, value=config["line_width"]
         )
         config["line_color"] = st.color_picker(
             "Line color:", value=config["line_color"]
         )
         st.subheader("Marker")
-        col1, col2 = st.beta_columns(2)
-        config["marker"] = col1.text_input("Marker type", value=config["marker"])
-        config["marker_size"] = col2.number_input(
+        config["marker"] = st.text_input("Marker type", value=config["marker"])
+        config["marker_size"] = st.number_input(
             "Marker size:", min_value=0.0, value=config["marker_size"]
         )
         st.markdown(
@@ -217,22 +214,20 @@ if data_complete:
             "Title color:", value=config["title_color"]
         )
         st.subheader("x-axis")
-        col1, col2 = st.beta_columns(2)
-        config["xlim_min"] = col1.number_input(
+        config["xlim_min"] = st.number_input(
             "Min value: ", key="xlim_min", value=config["xlim_min"]
         )
-        config["xlim_max"] = col2.number_input(
+        config["xlim_max"] = st.number_input(
             "Max value: ", key="xlim_max", value=config["xlim_max"]
         )
         config["xlabel"] = st.text_input("Label:", key="xlabel", value=config["xlabel"])
         config["xlabel_size"] = st.number_input(
             "Label size:", key="xlabel_size", min_value=0.0, value=config["xlabel_size"]
         )
-        col1, col2 = st.beta_columns(2)
-        config["xticks_size"] = col1.number_input(
+        config["xticks_size"] = st.number_input(
             "Ticks size:", key="xticks_size", min_value=0.0, value=config["xticks_size"]
         )
-        config["xticks_interval"] = col2.number_input(
+        config["xticks_interval"] = st.number_input(
             "Ticks interval:",
             key="xticks_interval",
             min_value=0.0,
@@ -246,22 +241,20 @@ if data_complete:
             "Ticks color:", key="xticks_color", value=config["xticks_color"]
         )
         st.subheader("y-axis")
-        col1, col2 = st.beta_columns(2)
-        config["ylim_min"] = col1.number_input(
+        config["ylim_min"] = st.number_input(
             "Min value: ", key="ylim_min", value=config["ylim_min"]
         )
-        config["ylim_max"] = col2.number_input(
+        config["ylim_max"] = st.number_input(
             "Max value: ", key="ylim_max", value=config["ylim_max"]
         )
         config["ylabel"] = st.text_input("Label:", key="ylabel", value=config["ylabel"])
         config["ylabel_size"] = st.number_input(
             "Label size:", key="ylabel_size", min_value=0.0, value=config["ylabel_size"]
         )
-        col1, col2 = st.beta_columns(2)
-        config["yticks_size"] = col1.number_input(
+        config["yticks_size"] = st.number_input(
             "Ticks size:", key="yticks_size", min_value=0.0, value=config["yticks_size"]
         )
-        config["yticks_interval"] = col2.number_input(
+        config["yticks_interval"] = st.number_input(
             "Ticks interval:",
             key="yticks_interval",
             min_value=0.0,

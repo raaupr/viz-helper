@@ -12,7 +12,7 @@ marker_size: 0.0
 marker_facecolor: "#000000"
 marker_edgecolor: "#000000"
 
-title: Polyhedra Volumes
+title: Ellipsoid Volumes
 title_size: 30.0
 title_color: "#000000"
 
