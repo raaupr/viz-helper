@@ -5,6 +5,10 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from queue import Queue
 import streamlit as st
+from mpl_toolkits.mplot3d import Axes3D
+import mpl_toolkits.mplot3d as a3
+import matplotlib.colors as colors
+import scipy as sp
 
 
 @st.cache
@@ -101,6 +105,35 @@ def plot_alphashape(pts, triangles, text=None, compute_range=False):
         return fig, (minx, miny, minz, maxx, maxy, maxz)
     return fig
 
+@st.cache(allow_output_mutation=True)
+def plot_alphashape_matplotlib(fig, pts, triangles, text=None):
+    ax = Axes3D(fig)
+    ax.plot(pts.T[0], pts.T[1], pts.T[2], "ko")
+    minx = miny = minz = 999999999
+    maxx = maxy = maxz = -999999999        
+    for s in triangles:
+        s = np.append(s, s[0])  # Here we cycle back to the first coordinate
+#         ax.plot(pts[s, 0], pts[s, 1], pts[s, 2], "r-")
+        vtx = np.array([pts[i] for i in s])
+        tri = a3.art3d.Poly3DCollection([vtx])
+        tri.set_color(colors.rgb2hex(sp.rand(3)))
+        tri.set_edgecolor('k')
+#         ax.add_collection3d(tri)
+        ax.add_collection3d(a3.art3d.Poly3DCollection([vtx], 
+                                                    # facecolors='w', 
+                                                    facecolors=colors.rgb2hex(sp.rand(3)),
+                                                    linewidths=1, alpha=0.9))
+        ax.add_collection3d(a3.art3d.Line3DCollection([vtx], colors='k', linewidths=0.2, linestyles=':'))
+        # if compute_range:
+        minx = min(minx, min(vtx[:, 0]))
+        miny = min(miny, min(vtx[:, 1]))
+        minz = min(minz, min(vtx[:, 2]))
+        maxx = max(maxx, max(vtx[:, 0]))
+        maxy = max(maxy, max(vtx[:, 1]))
+        maxz = max(maxz, max(vtx[:, 2]))        
+    for i in ["x", "y", "z"]:
+        eval("ax.set_{:s}label('{:s}')".format(i, i))
+    return fig, (minx, miny, minz, maxx, maxy, maxz)
 
 @st.cache
 def switch(cur_tri, tri, same_elmts):
@@ -156,7 +189,7 @@ def compute_volume(pts, triangles):
     volume = abs(volume)
     return volume
 
-
+@st.cache
 def compute_volume_tetras(pts, triangles, tetras):
     volume = 0
     for plane in triangles:
