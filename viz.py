@@ -13,9 +13,8 @@ from plot_distance_length import (
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1.5
+VERSION = 1.6
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
-ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
 st.title("Visualize Chromosome Distance & Splindle Length vs Time")
 st.sidebar.write(f"Version: {VERSION}")
@@ -337,13 +336,13 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     )
     
     if st.button("Save"):
-        if config["PLOT"]["save_file"][-4:] in ALLOWED_OUTFILE_EXT:
-            plt.savefig(config["PLOT"]["save_file"])
-            st.info(f"Plot saved to {config['PLOT']['save_file']}")
-        else:
-            st.error(
-                f"Plot not saved: save file name can only ends with either '.jpg', '.png' or '.eps'"
-            )
+        # if config["PLOT"]["save_file"][-4:] in ALLOWED_OUTFILE_EXT:
+        plt.savefig(config["PLOT"]["save_file"])
+        st.info(f"Plot saved to {config['PLOT']['save_file']}")
+        # else:
+        #     st.error(
+        #         f"Plot not saved: save file name can only ends with either '.jpg', '.png' or '.eps'"
+        #     )
 
     if df_distance is not None:
         st.write(
