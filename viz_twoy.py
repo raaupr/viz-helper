@@ -13,7 +13,7 @@ from plot_distance_length import(
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1.5
+VERSION = 1.6
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 # ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
@@ -159,8 +159,8 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     
     if df_distance is not None:
         config["DISTANCE"]["point_size"] = st.sidebar.number_input("Size of distance points:", value=config["DISTANCE"]["point_size"], min_value=0.0)
-    if config["DISTANCE"]["plot_distance_means"]:
         config["DISTANCE"]["line_size"] = st.sidebar.number_input("Distance line width:", value=config["DISTANCE"]["line_size"], min_value=0.0)
+    if config["DISTANCE"]["plot_distance_means"]:
         config["DISTANCE"]["means_size"] = st.sidebar.number_input("Distance means line width:", value=config["DISTANCE"]["means_size"], min_value=0.0)
         if config["DISTANCE"]["means_error_type"] != "None":
             config["DISTANCE"]["error_size"] = st.sidebar.number_input("Distance error line width:", value=config["DISTANCE"]["error_size"], min_value=0.0)
