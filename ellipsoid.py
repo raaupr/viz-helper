@@ -9,6 +9,8 @@ import numpy as np
 import plotly.graph_objs as go
 import streamlit as st
 from numpy import linalg
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 # @st.cache
@@ -164,4 +166,72 @@ def plot_ellipsoid(
     maxz = max(max(z), max(z2.flatten()))
 
     fig.update_traces(showlegend=False)
+    return fig, (minx, miny, minz, maxx, maxy, maxz)
+
+@st.cache(allow_output_mutation=True)
+def plot_ellipsoid_matplotlib(
+    fig,
+    P,
+    center,
+    radii,
+    rotation,
+    plot_axes=True,
+    P_text = None,
+    cage_color="yellow",
+    surface_color="blue",
+    marker_color="red",
+    axes_color="black",
+):
+    ax = Axes3D(fig)
+
+    # -- plot points
+    ax.scatter(P[:,0], P[:,1], P[:,2], color=marker_color, marker='o', s=100)
+
+    # -- plot sphere
+    u = np.linspace(0.0, 2.0 * np.pi, 100)
+    v = np.linspace(0.0, np.pi, 100)
+
+    # cartesian coordinates that correspond to the spherical angles:
+    x = radii[0] * np.outer(np.cos(u), np.sin(v))
+    y = radii[1] * np.outer(np.sin(u), np.sin(v))
+    z = radii[2] * np.outer(np.ones_like(u), np.cos(v))
+    # rotate accordingly
+    for i in range(len(x)):
+        for j in range(len(x)):
+            [x[i,j],y[i,j],z[i,j]] = np.dot([x[i,j],y[i,j],z[i,j]], rotation) + center
+
+    if plot_axes:
+        # make some purdy axes
+        axes = np.array([[radii[0],0.0,0.0],
+                        [0.0,radii[1],0.0],
+                        [0.0,0.0,radii[2]]])
+        # rotate accordingly
+        for i in range(len(axes)):
+            axes[i] = np.dot(axes[i], rotation)
+
+        # plot axes
+        for p in axes:
+            X3 = np.linspace(-p[0], p[0], 100) + center[0]
+            Y3 = np.linspace(-p[1], p[1], 100) + center[1]
+            Z3 = np.linspace(-p[2], p[2], 100) + center[2]
+            ax.plot(X3, Y3, Z3, color=axes_color)
+
+    # plot ellipsoid
+    ax.plot_wireframe(x, y, z,  rstride=4, cstride=4, color=cage_color, alpha=0.2)
+            
+    # ax.azim += 1    
+    # elev = 0.    
+    # for ii in range(0,360,1):
+    #     ax.view_init(elev=elev, azim=ii)
+    #         savefig("movie%d.png" % ii)
+    # print(ax.azim, ax.elev, ax.dist)
+
+    # ax.elev = 30. # angle between the eye and the xy plane.
+    # ax.azim = -60 # rotation around the z axis; 0 means "looking from +x", 90 means "looking from +y"
+    # ax.dist = 20 # distance from the center visible point in data coordinates.
+
+    minx, maxx = ax.get_xbound()
+    miny, maxy = ax.get_ybound()
+    minz, maxz = ax.get_zbound()
+
     return fig, (minx, miny, minz, maxx, maxy, maxz)
