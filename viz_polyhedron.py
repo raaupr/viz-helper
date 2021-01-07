@@ -12,7 +12,7 @@ from polyhedron import (
     alpha_shape_3d_autoalpha,
     compute_volume_tetras,
     orient_faces,
-    plot_alphashape,
+    plot_alphashape
 )
 from util_viz import LINE_STYLES, select_config
 
@@ -114,7 +114,7 @@ if data_complete:
                     ]
                 ).transpose()
                 _, _, triangles, tetras = alpha_shape_3d_autoalpha(pos)
-                triangles = orient_faces(triangles)
+                # triangles = orient_faces(triangles)
                 volume = compute_volume_tetras(pos, triangles, tetras)
                 volumes.append(volume)
                 polyhedra[time] = {"pos": pos, "triangles": triangles, "volume": volume}
@@ -133,7 +133,7 @@ if data_complete:
                 polyhedra[time]["pos"],
                 polyhedra[time]["triangles"],
                 names,
-                compute_range=True,
+                compute_range=True
             )
             st.write("Range: ")
             colx, coly, colz = st.beta_columns(3)
