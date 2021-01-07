@@ -130,3 +130,12 @@ dmypy.json
 
 # Data
 *.xlsx
+*.csv
+
+# Images
+*.pdf
+*.eps
+*.png
+*.jpg
+*.tiff
+*.svg
