@@ -11,7 +11,7 @@ from packaging import version
 from ellipsoid import  plot_ellipsoid, get_ellipsoid_volume, get_min_vol_ellipse
 from util_viz import LINE_STYLES, select_config
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 cur_ver = version.parse(VERSION)
 
@@ -120,18 +120,21 @@ if data_complete:
             st.stop()
 
     with st.beta_expander("Visualization", expanded=True):
-        col1, col2 = st.beta_columns([1, 3])
-        time = col1.selectbox("Choose timestamp:", uniq_times)
-        col1.write(pd.DataFrame(ellipsoids[time]["pos"], columns=["x", "y", "z"]))
-        col1.write(f"Volume: {ellipsoids[time]['volume']}")
+        # col1, col2 = st.beta_columns([1, 3])
+        time = st.selectbox("Choose timestamp:", uniq_times)
+        st.write(pd.DataFrame(ellipsoids[time]["pos"], columns=["x", "y", "z"]))
+        st.write(f"Volume: {ellipsoids[time]['volume']}")
         with st.spinner("Creating plot..."):
             # -- plot alpha shape
+            P_text = None
+            if names is not None:
+                P_text = names[times == time]
             fig, (minx, miny, minz, maxx, maxy, maxz) = plot_ellipsoid(
                 ellipsoids[time]["pos"],
                 ellipsoids[time]["center"],
                 ellipsoids[time]["radii"],
                 ellipsoids[time]["rotation"],
-                P_text=names[times == time],
+                P_text=P_text,
                 plot_axes=True,
                 cage_color="green",
                 surface_color="blue",
@@ -159,7 +162,7 @@ if data_complete:
                     zaxis=dict(range=[minz, maxz])
                 )
             )
-            col2.plotly_chart(fig)
+            st.plotly_chart(fig)
 
     with st.sidebar.beta_expander("Edit volume plot", expanded=False):
         # -- load config
