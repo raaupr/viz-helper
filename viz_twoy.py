@@ -35,7 +35,7 @@ if fin_config:
     config = yaml.load(fin_config, Loader=yaml.Loader)
     st.info("Configuration file loaded")
     if 'VERSION' not in config or config['VERSION'] < 1.5:
-        config['DISTANCE']['line_size'] = 0    
+        config['DISTANCE']['line_size'] = 0.0 
 
 # -- Get data
 st.sidebar.header("Distance")
