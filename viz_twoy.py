@@ -13,7 +13,7 @@ from plot_distance_length import(
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1.6
+VERSION = 1.7
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 # ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
