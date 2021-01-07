@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from fire import Fire
 from matplotlib import pyplot
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 from util_colormap import get_continuous_cmap
 from plot_distance_length import (
@@ -31,6 +31,7 @@ def create_plot(
     distance_stds: pd.Series,
     d_line_color: str,
     d_error_color: str,
+    d_width: float,
     d_size: int,
     d_border: str,
     d_means_size: int,
@@ -84,6 +85,8 @@ def create_plot(
         Color for the distance means.
     d_error_color : str
         Color for the distance std. dev.
+    d_width : float
+        Width of the distance line.
     d_size : int
         Size of the scatter points of the distance.
     d_border : str
@@ -245,8 +248,14 @@ def create_plot(
                 )
         # scatter
         y = df_distance.index
+        norm = Normalize(vmin=distance_min, vmax=distance_max)
         for i in range(len(df_distance.columns)):
             x = df_distance[df_distance.columns[i]]
+            if d_width > 0:
+                for j in range(len(x)-1):
+                    ax.plot(x.iloc[j:j+2], 
+                            color=distance_cmap(norm(x.iloc[j])), 
+                            linewidth=d_width)
             sc = cur_ax.scatter(
                 y,
                 x,

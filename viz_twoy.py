@@ -13,7 +13,7 @@ from plot_distance_length import(
 )
 from util_colormap import get_colormap_plot, get_continuous_cmap_bypoint
 
-VERSION = 1.4
+VERSION = 1.5
 ERROR_BAR_TYPES = ["None", "SD", "SEM"]
 # ALLOWED_OUTFILE_EXT = [".jpg", ".png", ".eps"]
 
@@ -34,6 +34,8 @@ fin_config = st.sidebar.file_uploader(
 if fin_config:
     config = yaml.load(fin_config, Loader=yaml.Loader)
     st.info("Configuration file loaded")
+    if 'VERSION' not in config or config['VERSION'] < 1.5:
+        config['DISTANCE']['line_size'] = 0    
 
 # -- Get data
 st.sidebar.header("Distance")
@@ -158,6 +160,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
     if df_distance is not None:
         config["DISTANCE"]["point_size"] = st.sidebar.number_input("Size of distance points:", value=config["DISTANCE"]["point_size"], min_value=0.0)
     if config["DISTANCE"]["plot_distance_means"]:
+        config["DISTANCE"]["line_size"] = st.sidebar.number_input("Distance line width:", value=config["DISTANCE"]["line_size"], min_value=0.0)
         config["DISTANCE"]["means_size"] = st.sidebar.number_input("Distance means line width:", value=config["DISTANCE"]["means_size"], min_value=0.0)
         if config["DISTANCE"]["means_error_type"] != "None":
             config["DISTANCE"]["error_size"] = st.sidebar.number_input("Distance error line width:", value=config["DISTANCE"]["error_size"], min_value=0.0)
@@ -305,6 +308,7 @@ if (config["DISTANCE"]["plot_distance"] and df_distance is not None) or (
             distance_stds,
             config["DISTANCE"]["means_color"],
             config["DISTANCE"]["error_color"],
+            config["DISTANCE"]["line_size"],
             config["DISTANCE"]["point_size"],
             config["DISTANCE"]["point_border_color"],
             config["DISTANCE"]["means_size"],

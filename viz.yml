@@ -1,4 +1,4 @@
-VERSION: 1.2
+VERSION: 1.7
 
 DISTANCE:
   plot_distance: False
@@ -8,6 +8,7 @@ DISTANCE:
   point_size: 40.0
   point_use_border: False
   point_border_color: "#000000"
+  line_size: 0.0
   means_size: 2.0
   error_size: 2.0
   means_color: "#FFA500"
