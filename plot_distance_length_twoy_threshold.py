@@ -15,154 +15,24 @@ from matplotlib import pyplot
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 from util_colormap import get_continuous_cmap
-
-DEFAULT_HEX_LIST = [
-    "#FEFAE0",
-    "#FFE66D",
-    "#FCBF49",
-    "#FFBA08",
-    "#FAA307",
-    "#F48C06",
-    "#E85D04",
-    "#DC2F02",
-    "#D00000",
-    "#9D0208",
-    "#6A040F",
-    "#370617",
-    "#03071E",
-]
-DEFAULT_PROPORTION_LIST = [4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1]
-
-
-def clean(x: object) -> object:
-    """Clean a cell value.
-    In this case, if it's a string, we will ignore it (i.e. make it nan).
-
-    Parameters
-    ----------
-    x : object
-        Value of a dataframe cell
-
-    Returns
-    -------
-    object
-        nan if it's a string, it's original value otherwise.
-    """
-    if isinstance(x, str):
-        return np.nan
-    return x
-
-
-def read_file(filepath: str, sheet_name: str = None) -> pd.DataFrame:
-    """Read input distance or length file.
-    This function will also preprocess the data (clean, set index, filter).
-
-    Parameters
-    ----------
-    filepath : str
-        The path to the input file.
-    sheet_name : str [optional]
-        The sheet name to read, by default the first sheet.
-
-    Returns
-    -------
-    pd.DataFrame
-        The data from the file.
-    """
-    if sheet_name is None:
-        df = pd.read_excel(filepath)
-    else:
-        df = pd.read_excel(filepath, sheet_name=sheet_name)
-    df = df.set_index(df.columns[0])
-    df = df.applymap(clean)
-    return df
-
-def half(x: object) -> object:
-    """Half the value of a cell if it's not nan.x
-
-    Parameters
-    ----------
-    x : object
-        Value of the cell, can be nan
-
-    Returns
-    -------
-    object
-        Half of the original value if not nan.x
-    """
-    if not np.isnan(x):
-        return x / 2
-    return x
-
-
-def get_means_error(
-    df: pd.DataFrame, error_type: str = "SD"
-) -> Tuple[pd.Series, pd.Series]:
-    """Compute the mean and standard deviation of the data.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        The dataframe containing distance/length data.
-    error_type : str
-        Can be either "SD" or "SEM" (standard dev. or standard means of err.)
-
-    Returns
-    -------
-    Tuple[pd.Series, pd.Series]
-        Tuple: means, standard deviation
-    """
-    means = df.mean(axis=1, skipna=True)
-    if error_type is None or error_type.lower() == "none":
-        err = None
-    elif error_type == "SD":
-        err = df.std(axis=1, skipna=True)
-    elif error_type == "SEM":
-        err = df.sem(axis=1, skipna=True)
-    return means, err
-
-
-def get_distance_cmap(
-    hex_list: List[str], proportion_list: List[int]
-) -> LinearSegmentedColormap:
-    """Create a colormap for the distance scatter plot.py
-
-    Parameters
-    ----------
-    hex_list : List[str]
-        List of hex colors for the plot.
-        The list should only contain the extreme color up to the middle color.
-        This function will automatically mirror the colors to make a symmetrical colormap.
-    proportion_list : List[int]
-        List of proportions of the colors.
-        This determines how much bigger is the area for each color relative to the other colors.
-        The length of this list should be the same as the hex_list.
-
-    Returns
-    -------
-    LinearSegmentedColormap
-        Generated color map.
-    """
-    hex_list = hex_list + hex_list[:-1][::-1]
-    if proportion_list is None:
-        float_list = None
-    else:
-        proportion_list = proportion_list + proportion_list[:-1][::-1]
-        float_list = [0.0]
-        for i in proportion_list[:-1]:
-            float_list.append(float_list[-1] + i / (sum(proportion_list)))
-        float_list[-1] = 1.0
-    distance_cmap = get_continuous_cmap(hex_list, float_list)
-    return distance_cmap
+from plot_distance_length import (
+    read_file,
+    get_means_error,
+    DEFAULT_HEX_LIST,
+    DEFAULT_PROPORTION_LIST,
+    half,
+    get_distance_cmap,
+)
 
 
 def create_plot(
     df_distance: pd.DataFrame,
+    df_threshold,
     distance_means: pd.Series,
     distance_stds: pd.Series,
-    d_line_width: float,
     d_line_color: str,
     d_error_color: str,
+    d_width: float,
     d_size: int,
     d_border: str,
     d_means_size: int,
@@ -184,17 +54,22 @@ def create_plot(
     cbar_ticks_size: float,
     show_grid: bool,
     xlim: Tuple[int, int],
-    ylim: Tuple[int, int],
+    d_ylim: Tuple[int, int],
+    l_ylim: Tuple[int, int],
     title: str,
     xlabel: str,
-    ylabel: str,
+    d_ylabel: str,
+    l_ylabel: str,
     title_size: float,
     xlabel_size: float,
-    ylabel_size: float,
+    d_ylabel_size: float,
+    l_ylabel_size: float,
     xticks_size: float,
-    yticks_size: float,
+    d_yticks_size: float,
+    l_yticks_size: float,
     xticks_interval: float,
-    yticks_interval: float,
+    d_yticks_interval: float,
+    l_yticks_interval: float,
     marker,
 ) -> pyplot:
     """Create plot and save it to a file.
@@ -207,12 +82,12 @@ def create_plot(
         The distance means.
     distance_stds : pd.Series
         The distance standard deviations.
-    d_line_width : float,
-        The width of distance lines.
     d_line_color : str
         Color for the distance means.
     d_error_color : str
         Color for the distance std. dev.
+    d_width : float
+        Width of the distance line.
     d_size : int
         Size of the scatter points of the distance.
     d_border : str
@@ -288,98 +163,129 @@ def create_plot(
 
     fig, ax = plt.subplots(figsize=(width, height))
 
-    # distance
-    if df_distance is not None:
-        norm = Normalize(vmin=distance_min, vmax=distance_max)
-        y = df_distance.index
-        for i in range(len(df_distance.columns)):
-            x = df_distance[df_distance.columns[i]]
-            if d_line_width > 0:
-                for j in range(len(x)-1):
-                    ax.plot(x.iloc[j:j+2], 
-                            color=distance_cmap(norm(x.iloc[j])), 
-                            linewidth=d_line_width)
-            sc = ax.scatter(
-                y,
-                x,
-                c=x,
-                label=df_distance.columns[i],
-                cmap=distance_cmap,
-                marker=marker,
-                s=d_size,
-                vmin=distance_min,
-                vmax=distance_max,
-                edgecolors=d_border,
-                zorder=4
-            )
-        # means & std
-        if distance_means is not None:
-            plt.plot(
-                df_distance.index,
-                distance_means,
-                color=d_line_color,
-                linewidth=d_means_size,
-                zorder=5
-            )
-            if distance_stds is not None:
-                plt.fill_between(
-                    df_distance.index,
-                    distance_means - distance_stds,
-                    distance_means + distance_stds,
-                    color=d_error_color,
-                    alpha=0.2,
-                    zorder=3
-                )
+    if df_distance is not None and df_length is not None:
+        axes = [ax, ax.twinx()]
+        # Make some space on the right side for the extra y-axis.
+        # fig.subplots_adjust(right=0.8)
+        # Move the last y-axis spine over to the right by 20% of the width of the axes
+        # axes[-1].spines['right'].set_position(('axes', 1.2))
+        # To make the border of the right-most axis visible, we need to turn the frame
+        # on. This hides the other plots, however, so we need to turn its fill off.
+        axes[-1].set_frame_on(True)
+        axes[-1].patch.set_visible(False)
+    else:
+        axes = [ax]
 
     # length
     if df_length is not None:
-        plt.plot(
+        cur_ax = axes[0]
+        # if half_length:
+        cur_ax.plot(
             df_length.index,
             length_means,
             color=l_line_color,
             linewidth=l_means_size,
-            zorder=2
+            zorder=2,
         )
         if length_stds is not None:
-            plt.fill_between(
+            cur_ax.fill_between(
                 df_length.index,
                 length_means - length_stds,
                 length_means + length_stds,
-                color=l_error_color,
+                color="none",
                 alpha=0.2,
-                zorder=1
+                facecolor=l_error_color,
+                zorder=1,
             )
         if half_length:
-            plt.plot(
+            cur_ax.plot(
                 df_length.index,
                 -length_means,
                 color=l_line_color,
                 linewidth=l_means_size,
-                zorder=2
+                zorder=2,
             )
             if length_stds is not None:
-                plt.fill_between(
+                cur_ax.fill_between(
                     df_length.index,
                     -length_means - length_stds,
                     -length_means + length_stds,
-                    color=l_error_color,
+                    color="none",
                     alpha=0.2,
-                    zorder=1
+                    facecolor=l_error_color,
+                    zorder=1,
                 )
+        cur_ax.set_ylabel(
+            l_ylabel,
+            size=l_ylabel_size,
+        )
+        cur_ax.set_ylim(l_ylim)
+        cur_ax.set_yticks(
+            np.arange(l_ylim[0], l_ylim[1] + l_yticks_interval, l_yticks_interval)
+        )
+        cur_ax.tick_params(axis="y", labelsize=l_yticks_size)
+
+    # distance
+    if df_distance is not None:
+        cur_ax = axes[-1]
+        # means & std
+        if distance_means is not None:
+            cur_ax.plot(
+                df_distance.index,
+                distance_means,
+                linewidth=d_means_size,
+                color=d_line_color,
+                zorder=5,
+            )
+            if distance_stds is not None:
+                cur_ax.fill_between(
+                    df_distance.index,
+                    distance_means - distance_stds,
+                    distance_means + distance_stds,
+                    color="none",
+                    alpha=0.2,
+                    facecolor=d_error_color,
+                    zorder=3,
+                )
+        # scatter
+        y = df_distance.index
+        norm = Normalize(vmin=distance_min, vmax=distance_max)
+        for time_stamp in y:
+            threshold = df_threshold.at[time_stamp, df_threshold.columns[0]] * 100
+            if not np.isnan(threshold):
+                x = df_distance.loc[time_stamp].to_numpy()
+                sc = cur_ax.scatter(
+                    [time_stamp] * len(x),
+                    x,
+                    c=[threshold] * len(x),
+                    label=df_distance.columns,
+                    cmap=distance_cmap,
+                    marker=marker,
+                    s=d_size,
+                    vmin=distance_min,
+                    vmax=distance_max,
+                    edgecolors=d_border,
+                    zorder=4,
+                )
+        cur_ax.set_ylabel(
+            d_ylabel,
+            size=d_ylabel_size,
+        )
+        cur_ax.set_ylim(d_ylim)
+        cur_ax.set_yticks(
+            np.arange(d_ylim[0], d_ylim[1] + d_yticks_interval, d_yticks_interval)
+        )
+        cur_ax.tick_params(axis="y", labelsize=d_yticks_size)
 
     plt.title(title, size=title_size)
-    plt.ylabel(ylabel, size=ylabel_size)
-    plt.xlabel(xlabel, size=xlabel_size)
 
-    plt.ylim(ylim)
-    plt.xticks(np.arange(xlim[0], xlim[1]+xticks_interval, xticks_interval), 
-                fontsize=xticks_size)
-    plt.yticks(np.arange(ylim[0], ylim[1]+yticks_interval, yticks_interval), 
-                fontsize=yticks_size)
+    ax.set_xlabel(xlabel, size=xlabel_size)
+    ax.set_xticks(np.arange(xlim[0], xlim[1] + xticks_interval, xticks_interval))
+    ax.tick_params(axis="x", labelsize=xticks_size)
 
     if df_distance is not None and show_colorbar:
-        cbar = plt.colorbar(sc)
-        cbar.ax.tick_params(labelsize=cbar_ticks_size) 
+        cbar = plt.colorbar(sc, orientation="horizontal")
+        cbar.ax.tick_params(labelsize=cbar_ticks_size)
     if show_grid:
         plt.grid()
 
@@ -533,17 +439,22 @@ def main(
         show_grid,
         (min_time, max_time),
         (ylim_min, ylim_max),
+        (ylim_min, ylim_max),
         title,
         xlabel,
-        ylabel,
-        10,
-        10,
-        10,
-        10,
-        10,
-        100.0,
-        1.0,
-        "o",
+        d_ylabel=ylabel,
+        l_ylabel=ylabel,
+        title_size=10,
+        xlabel_size=10,
+        d_ylabel_size=10,
+        l_ylabel_size=10,
+        xticks_size=10,
+        d_yticks_size=10,
+        l_yticks_size=10,
+        xticks_interval=100,
+        d_yticks_interval=1,
+        l_yticks_interval=1,
+        marker="o",
     )
 
     plt.savefig(outfile)
