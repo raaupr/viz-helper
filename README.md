@@ -18,6 +18,9 @@ Run one of these commands in the terminal in the unzipped/cloned folder.
 streamlit run viz.py
 ```
 ```bash
+streamlit run viz_threshold.py
+```
+```bash
 streamlit run viz_twoy.py
 ```
 ```bash

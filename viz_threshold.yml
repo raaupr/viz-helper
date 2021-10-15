@@ -1,0 +1,60 @@
+VERSION: 1.7
+
+DISTANCE:
+  plot_distance: False
+  plot_distance_means: True
+  means_error_type: None
+  point_type: o
+  point_size: 40.0
+  point_use_border: False
+  point_border_color: "#000000"
+  line_size: 0.0
+  means_size: 2.0
+  error_size: 2.0
+  means_color: "#FFA500"
+  error_color: "#FFA500"
+  colormap_min: -3.0
+  colormap_max: 3.0
+  colormap_hex: 
+    - "#FFBA08"
+    - "#D00000"
+    - "#03071E"
+    - "#D00000"
+    - "#FFBA08"
+  colormap_float: 
+    - -3.0
+    - -1.0
+    - 0.0
+    - 1.0
+    - 3.0
+  show_colorbar: False
+  colorbar_ticks_size: 10.0
+
+LENGTH:
+  plot_length_means: False
+  half_symmetric_length: True
+  means_error_type: None
+  means_size: 2.0
+  error_size: 2.0
+  means_color: "#008000"
+  error_color: "#008000"
+
+PLOT:
+  xlim_min: -99999999
+  xlim_max: 99999999
+  ylim_min: -5.0
+  ylim_max: 5.0
+  title: JDU233 in utero congression
+  title_size: 15.0
+  xlabel: Time relative to Anaphase Onset (s)
+  xlabel_size: 10.0
+  xticks_size: 10.0
+  xticks_interval: 100.0
+  ylabel: Distance to spindle equator (\u03BCm)
+  ylabel_size: 10.0
+  yticks_size: 10.0
+  yticks_interval: 1.0
+  width: 20.0
+  height: 10.0
+  show_grid: False
+  save_file: plot.eps
