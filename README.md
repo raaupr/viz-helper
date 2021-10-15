@@ -21,6 +21,9 @@ streamlit run viz.py
 streamlit run viz_twoy.py
 ```
 ```bash
+streamlit run viz_twoy_threshold.py
+```
+```bash
 streamlit run viz_polyhedron.py
 ```
 ```bash
