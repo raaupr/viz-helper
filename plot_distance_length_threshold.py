@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from fire import Fire
-from matplotlib import pyplot
+from matplotlib import collections, pyplot
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 from util_colormap import get_continuous_cmap
@@ -155,8 +155,10 @@ def create_plot(
 
     # distance
     if df_distance is not None:
-        norm = Normalize(vmin=distance_min, vmax=distance_max)
         y = df_distance.index
+        prev_x = None
+        prev_threshold = None
+        prev_time_stamp = None
         for time_stamp in y:
             threshold = df_threshold.at[time_stamp, df_threshold.columns[0]] * 100
             if not np.isnan(threshold):
@@ -174,6 +176,17 @@ def create_plot(
                     edgecolors=d_border,
                     zorder=4,
                 )
+                if d_line_width > 0 and prev_x is not None:
+                    data_dict = {}
+                    for i, (x_0, x_1) in enumerate(zip(prev_x, x)):
+                        data_dict[i] = [x_0, x_1]
+                    df_line = pd.DataFrame(data_dict, index=[prev_time_stamp, time_stamp])
+                    ax.plot(df_line,
+                            color=distance_cmap(prev_threshold/100), 
+                            linewidth=d_line_width)
+                prev_x = x
+                prev_threshold = threshold
+                prev_time_stamp = time_stamp
         # means & std
         if distance_means is not None:
             plt.plot(

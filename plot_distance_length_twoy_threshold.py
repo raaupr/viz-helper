@@ -249,7 +249,9 @@ def create_plot(
                 )
         # scatter
         y = df_distance.index
-        norm = Normalize(vmin=distance_min, vmax=distance_max)
+        prev_x = None
+        prev_threshold = None
+        prev_time_stamp = None
         for time_stamp in y:
             threshold = df_threshold.at[time_stamp, df_threshold.columns[0]] * 100
             if not np.isnan(threshold):
@@ -267,6 +269,17 @@ def create_plot(
                     edgecolors=d_border,
                     zorder=4,
                 )
+                if d_width > 0 and prev_x is not None:
+                    data_dict = {}
+                    for i, (x_0, x_1) in enumerate(zip(prev_x, x)):
+                        data_dict[i] = [x_0, x_1]
+                    df_line = pd.DataFrame(data_dict, index=[prev_time_stamp, time_stamp])
+                    ax.plot(df_line,
+                            color=distance_cmap(prev_threshold/100), 
+                            linewidth=d_width)
+                prev_x = x
+                prev_threshold = threshold
+                prev_time_stamp = time_stamp
         cur_ax.set_ylabel(
             d_ylabel,
             size=d_ylabel_size,
@@ -290,176 +303,3 @@ def create_plot(
         plt.grid()
 
     return plt
-
-
-def main(
-    file_distance: str,
-    file_length: str = None,
-    half_length: bool = True,
-    outfile: str = "foo.jpg",
-    min_time: int = -500,
-    max_time: int = 0,
-    distance_color: str = "orange",
-    distance_error_color: str = "orange",
-    length_color: str = "green",
-    length_error_color: str = "green",
-    distance_size: int = 40,
-    distance_border: str = "face",
-    plot_width: int = 20,
-    plot_height: int = 10,
-    show_colorbar: bool = False,
-    show_grid: bool = False,
-    hex_list: str = None,
-    proportion_list: List[int] = None,
-    distance_min: int = -3,
-    distance_max: int = 3,
-    ylim_min: int = -5,
-    ylim_max: int = 5,
-) -> None:
-    """Create a plot of chromosome distance to splindle equator & spindle length vs time relative to anaphase onset.
-
-    Parameters
-    ----------
-    file_distance : str
-        Path to excel file containing the data for chromosome distance to splindle equator vs time relative to anaphase onset.
-        Rows = time relative to anaphase onset; columns=data points; cell values = chromosome distance to splindle equator.
-        All values that are not proper numbers (e.g. ending with '*') will be ignored.
-        Make sure to write the path in between quotes.
-    file_length : str, optional
-        Path to excel file containing the data for spindle length vs time relative to anaphase onset, by default None.
-        Rows = time relative to anaphase onset; columns=data points; cell values = spindle length.
-        All values that are not proper numbers (e.g. ending with '*') will be ignored.
-        Make sure to write the path in between quotes.
-    half_length : bool, optional
-        Whether to plot the length by half and symmetrical, by default True.
-    outfile : str, optional
-        Path to the output image, by default "foo.jpg".
-        Make sure to write the path in between quotes. The file should end with either ".jpg" or ".png".
-    min_time : int, optional
-        The minimum time relative to anaphase onset that should be included, by default -500.
-    max_time : int, optional
-        The maximum time relative to anaphase onset that should be included, by default 0.
-    distance_color : str, optional
-        The color for distance means, by default 'orange'. It can accept standard colors.
-    distance_error_color : str, optional
-        The color for distance std dev, by default 'orange'. It can accept standard colors.
-    length_color : str, optional
-        The color for distance means, by default 'green'. It can accept standard colors.
-    length_error_color : str, optional
-        The color for distance std dev, by default 'green'. It can accept standard colors.
-    distance_size : int, optional
-        The size for distance data points, by default 40.
-    distance_border : str, optional
-        The border color for distance data points, by default "face". It can accept standard colors, "face" means the same color as the point.
-    plot_width : int, optional
-        The width of the resulting plot image, by default 20.
-    plot_height : int, optional
-        The width of the resulting plot image, by default 10.
-    show_colorbar : bool, optional
-        Use this option to show colorbar in the plot, by default False.
-    show_grid : bool, optional
-        Use this option to show grid in the plot, by default False.
-    hex_list : str, optional
-        List of colors (in hexadecimal code) to modify the colormap of the scatter plot, by default None.
-        The resulting colormap will be a symmetrical colormap.
-        For example, if -hex_list="#FEFAE0,#03071E", then the color map will be: #FEFAE0,#03071E,#FEFAE0
-    proportion_list : List[int], optional
-        List of proportion of how big each point (except for the last one) on the hex list should be, by default None.
-        For example, if -hex_list="#FEFAE0,#03071E" -proportion_list="1,2",
-        then the resulting colormap will be #FEFAE0,#03071E,#FEFAE0, with the area for #03071E being twice as big as the areas of the #FEFAE0s.
-    distance_min : int, optional
-        The lowest distance for the colormap, by default -3.
-        This determines what color of each values;
-        the extremes being the distance_min and distance_max, and the middle color being the middle between these two values.
-    distance_max : int, optional
-        The maximum distance for the colormap, by default 3.
-        This determines what color of each values;
-        the extremes being the distance_min and distance_max, and the middle color being the middle between these two values.
-    ylim_min : int, optional
-        The minimum value of the y axis, by default -5.
-    ylim_max : int, optional
-        The maximum value of the y axis, by default 5.
-    """
-
-    df_distance = read_file(file_distance)
-    df_distance = df_distance.loc[
-        (df_distance.index >= min_time) & (df_distance.index <= max_time)
-    ]
-    distance_means, distance_stds = get_means_error(df_distance)
-
-    if file_length is not None:
-        df_length = read_file(file_length)
-        df_length = df_length.loc[
-            (df_length.index >= min_time) & (df_length.index <= max_time)
-        ]
-        if half_length:
-            df_length = df_length.applymap(half)
-        length_means, length_stds = get_means_error(df_length)
-    else:
-        df_length = None
-        length_means = None
-        length_stds = None
-
-    if hex_list is None:
-        hex_list = DEFAULT_HEX_LIST
-        proportion_list = DEFAULT_PROPORTION_LIST
-    else:
-        hex_list = hex_list.split(",")
-    distance_cmap = get_distance_cmap(hex_list, proportion_list)
-
-    title = "JDU233 in utero congression"
-    ylabel = "Distance to spindle equator (\u03BCm)"
-    xlabel = "Time relative to Anaphase Onset (s)"
-
-    plt = create_plot(
-        df_distance,
-        distance_means,
-        distance_stds,
-        distance_color,
-        distance_error_color,
-        distance_size,
-        distance_border,
-        2,
-        2,
-        df_length,
-        half_length,
-        length_means,
-        length_stds,
-        length_color,
-        length_error_color,
-        2,
-        2,
-        distance_cmap,
-        distance_min,
-        distance_max,
-        plot_width,
-        plot_height,
-        show_colorbar,
-        10,
-        show_grid,
-        (min_time, max_time),
-        (ylim_min, ylim_max),
-        (ylim_min, ylim_max),
-        title,
-        xlabel,
-        d_ylabel=ylabel,
-        l_ylabel=ylabel,
-        title_size=10,
-        xlabel_size=10,
-        d_ylabel_size=10,
-        l_ylabel_size=10,
-        xticks_size=10,
-        d_yticks_size=10,
-        l_yticks_size=10,
-        xticks_interval=100,
-        d_yticks_interval=1,
-        l_yticks_interval=1,
-        marker="o",
-    )
-
-    plt.savefig(outfile)
-    print(f"Plot saved to {outfile}")
-
-
-if __name__ == "__main__":
-    Fire(main)
