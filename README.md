@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/316316473.svg)](https://zenodo.org/badge/latestdoi/316316473)
 # viz-helper
 Data visualization scripts for various projects.
 
