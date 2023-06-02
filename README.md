@@ -1,6 +1,15 @@
 [![DOI](https://zenodo.org/badge/316316473.svg)](https://zenodo.org/badge/latestdoi/316316473)
 # viz-helper
-Data visualization scripts for various projects.
+Helper tools for visualizations of chromosomes. 
+
+As published in: 
+
+>Kinetochore Components Function in C. elegans Oocytes Revealed by 4D Tracking of Holocentric Chromosomes
+
+Tools used in the paper:
+
+- `viz_threshold`
+- `viz_twoy_threshold`
 
 ## Getting Started
 1. Install [python](https://www.python.org/downloads/) (tested with 3.8.5)
